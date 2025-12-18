@@ -3,20 +3,20 @@
     autoplayIntervalTime: 4000,
     slides: [                
         {
-            imgSrc: 'https://t3.ftcdn.net/jpg/02/38/26/60/360_F_238266075_JLoq0ve35FVeeru8KJKNmPiZAVhaU0Ae.jpg',
-            imgAlt: 'Vibrant abstract painting with swirling blue and light pink hues on a canvas.',  
+            imgSrc: '{{ asset('images/slide-1.jpg') }}',
+            imgAlt: 'Hitek Automobiles Outside',
             title: 'Needs Professional Cleaning',
-            description: 'Auto maintenance, service & repair',           
+            description: 'Auto maintenance, service & repair',          
         },                
         {                    
-            imgSrc: 'https://t3.ftcdn.net/jpg/02/38/26/54/360_F_238265428_wQ97Q5qCmKB2ZMZrj2Q72NSF7HC2Ckpy.jpg',                    
-            imgAlt: 'Vibrant abstract painting with swirling red, yellow, and pink hues on a canvas.',  
+            imgSrc: '{{ asset('images/slide-2.jpg') }}',
+            imgAlt: 'Hitek Automobiles Sign Board',    
             title: 'Repairing Truly Personalized',
             description: 'Performance Without Compromise',            
         },                
         {                    
-            imgSrc: 'https://media.gettyimages.com/id/2162209513/video/car-mechanic-working-the-engine-bay.jpg?s=640x640&k=20&c=64i0xAQgiPF3iseJ8q-pCpiuORapGfGJqHAJgku7mfM=',                    
-            imgAlt: 'Vibrant abstract painting with swirling blue and purple hues on a canvas.',    
+            imgSrc: '{{ asset('images/slide-3.jpg') }}',             
+            imgAlt: 'Hitek Automobiles Interior',    
             title: 'Quality Meets Affordability',
             description: 'Exceptional service workmanship',       
         },            
@@ -57,7 +57,7 @@
    
     <!-- slides -->
     <!-- Change min-h-[50svh] to your preferred height size -->
-    <div class="relative min-h-[96svh]">
+    <div class="relative min-h-[99svh]">
         <template x-for="(slide, index) in slides">
             <div x-cloak x-show="currentSlideIndex == index + 1" class="absolute inset-0" x-transition.opacity.duration.1000ms>
                 

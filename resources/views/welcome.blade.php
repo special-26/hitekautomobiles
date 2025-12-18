@@ -205,7 +205,10 @@
     {{-- Cost Calculator --}}
     <section class="w-full">
         <!-- Hero -->
-        <div class="relative bg-[url('https://karsfix-demo.pbminfotech.com/demo1/wp-content/uploads/sites/2/2024/09/contact-form-bg.jpg')] bg-cover bg-center bg-no-repeat">
+        <div 
+            style="background-image: url('{{ asset('images/cost-bg.jpg') }}')" 
+            class="relative bg-cover bg-center bg-no-repeat"
+        >
             <div class="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
                 <!-- Grid -->
                 <div class="grid items-center md:grid-cols-2 gap-8 lg:gap-12">
