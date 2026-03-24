@@ -112,12 +112,11 @@
                         </button>
                     </div>
                     <div class="p-4">
-                        <h3 class="text-xl font-semibold text-gray-800">Maintenance</h3>
-                        <p class="mt-3 text-gray-500 dark:text-neutral-500">Some routine car care tasks can be done at home, while other may require a trained technician or</p>
+                        <h3 class="text-xl font-semibold text-gray-800">Regular Servicing</h3>
+                        <p class="mt-3 text-gray-500 dark:text-neutral-500">Complete periodic car servicing in Chandigarh to keep your vehicle running smoothly, safely, and efficiently with genuine parts and expert care.</p>
                     </div>
                 </div>
                 <!-- End Card -->
-
                 <!-- Card -->
                 <div class="group flex flex-col h-full bg-white border border-gray-200 shadow-2xs rounded-2xl">
                     <div class="h-52 flex flex-col justify-center items-center bg-blue-600 rounded-t-xl mb-6 relative">
@@ -127,12 +126,11 @@
                         </button>
                     </div>
                     <div class="p-4">
-                        <h3 class="text-xl font-semibold text-gray-800">Wheel Aligment</h3>
-                        <p class="mt-3 text-gray-500 dark:text-neutral-500">Wheel aligment refers to the adjustment of car's suspension the system connecting the wheels to the</p>
+                        <h3 class="text-xl font-semibold text-gray-800">Denting & Painting</h3>
+                        <p class="mt-3 text-gray-500 dark:text-neutral-500">Professional dent removal and high-quality painting to restore your car’s original look using advanced tools and color-matched finishes.</p>
                     </div>
                 </div>
                 <!-- End Card -->
-
                 <!-- Card -->
                 <div class="group flex flex-col h-full bg-white border border-gray-200 shadow-2xs rounded-2xl">
                     <div class="h-52 flex flex-col justify-center items-center bg-blue-600 rounded-t-xl mb-6 relative">
@@ -142,11 +140,41 @@
                         </button>
                     </div>
                     <div class="p-4">
-                        <h3 class="text-xl font-semibold text-gray-800">Engine Service</h3>
-                        <p class="mt-3 text-gray-500 dark:text-neutral-500">Engine oil is an integral part of your car engine's system help to maintain the temprature of the</p>
+                        <h3 class="text-xl font-semibold text-gray-800">Car Detailing</h3>
+                        <p class="mt-3 text-gray-500 dark:text-neutral-500">Complete interior and exterior detailing with Ceramic coating, PPF, and Full-body paint for long-lasting protection and a premium finish.</p>
                     </div>
                 </div>
                 <!-- End Card -->
+                <!-- Card -->
+                <div class="mt-6 group flex flex-col h-full bg-white border border-gray-200 shadow-2xs rounded-2xl">
+                    <div class="h-52 flex flex-col justify-center items-center bg-blue-600 rounded-t-xl mb-6 relative">
+                        <img src="https://karsfix-demo.pbminfotech.com/demo1/wp-content/uploads/sites/2/2024/09/service-img-01-880x520.jpg" class="rounded-2xl"/>
+                        <button class="h-14 w-14 rounded-full text-white bg-primary flex items-center justify-center absolute right-2 -bottom-12 border-6 border-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="m13.292 12l-4.6-4.6l.708-.708L14.708 12L9.4 17.308l-.708-.708z"/></svg>
+                        </button>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-xl font-semibold text-gray-800">Car Washing</h3>
+                        <p class="mt-3 text-gray-500 dark:text-neutral-500">Thorough exterior wash and interior cleaning for a spotless, hygienic, and well-maintained car—quick and affordable.</p>
+                    </div>
+                </div>
+                <!-- End Card -->
+                <!-- Card -->
+                <div class="mt-6 group flex flex-col h-full bg-white border border-gray-200 shadow-2xs rounded-2xl">
+                    <div class="h-52 flex flex-col justify-center items-center bg-blue-600 rounded-t-xl mb-6 relative">
+                        <img src="https://karsfix-demo.pbminfotech.com/demo1/wp-content/uploads/sites/2/2024/09/service-img-01-880x520.jpg" class="rounded-2xl"/>
+                        <button class="h-14 w-14 rounded-full text-white bg-primary flex items-center justify-center absolute right-2 -bottom-12 border-6 border-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="m13.292 12l-4.6-4.6l.708-.708L14.708 12L9.4 17.308l-.708-.708z"/></svg>
+                        </button>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-xl font-semibold text-gray-800">Insurance Services</h3>
+                        <p class="mt-3 text-gray-500 dark:text-neutral-500">Complete insurance support including renewals, claim assistance, inspections, and repair coordination for a smooth, stress-free experience.</p>
+                    </div>
+                </div>
+                <!-- End Card -->
+
+            </div>
 
         </div>
         <!-- End Card Blog --> 

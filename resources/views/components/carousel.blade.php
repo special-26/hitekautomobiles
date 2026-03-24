@@ -5,20 +5,20 @@
         {
             imgSrc: '{{ asset('images/slide-1.jpg') }}',
             imgAlt: 'Hitek Automobiles Outside',
-            title: 'Needs Professional Cleaning',
-            description: 'Auto maintenance, service & repair',          
+            title: 'Trusted Car Repair & Maintenance in Tricity',
+            description: 'Professional servicing, honest advice, and quality repairs — all under one roof',          
         },                
         {                    
             imgSrc: '{{ asset('images/slide-2.jpg') }}',
             imgAlt: 'Hitek Automobiles Sign Board',    
-            title: 'Repairing Truly Personalized',
-            description: 'Performance Without Compromise',            
+            title: 'Complete Car Care Solutions in Chandigarh',
+            description: 'From regular servicing to advanced diagnostics, we keep your car running smooth and safe.',
         },                
         {                    
             imgSrc: '{{ asset('images/slide-3.jpg') }}',             
             imgAlt: 'Hitek Automobiles Interior',    
-            title: 'Quality Meets Affordability',
-            description: 'Exceptional service workmanship',       
+            title: 'Car Trouble? Get Expert Help Today',
+            description: 'No long waits. No hidden costs. Just reliable service when you need it most.',       
         },            
     ],            
     currentSlideIndex: 1,
@@ -63,8 +63,8 @@
                 
                 <!-- Title and description -->
                 <div class="absolute inset-0 z-10 flex flex-col items-start justify-center gap-2 bg-linear-to-r from-neutral-950 to-transparent px-24 text-left">
-                    <h3 class="w-[70%] text-balance text-2xl lg:text-3xl font-bold text-white" x-text="slide.title" x-bind:aria-describedby="'slide' + (index + 1) + 'Description'"></h3>
-                    <h2 class="w-[70%] text-pretty text-[4em] font-bold text-neutral-300" x-text="slide.description" x-bind:id="'slide' + (index + 1) + 'Description'"></h2>
+                    <h3 class="w-[60%] text-balance text-[3em] font-bold text-white" x-text="slide.title" x-bind:aria-describedby="'slide' + (index + 1) + 'Description'"></h3>
+                    <p class="w-[60%] text-pretty text-2xl font-bold text-neutral-300" x-text="slide.description" x-bind:id="'slide' + (index + 1) + 'Description'"></p>
                 </div>
 
                 <img class="absolute w-full h-full inset-0 object-cover text-neutral-600 dark:text-neutral-300" x-bind:src="slide.imgSrc" x-bind:alt="slide.imgAlt" />

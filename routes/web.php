@@ -3,10 +3,18 @@
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
+use App\Livewire\ServiceSlotBooking;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 })->name('home');
+Route::get('/team', function () {
+    return view('team');
+})->name('team');
+Route::get('/team/nagender-sharma', function () {
+    return view('nagender');
+})->name('nagender');
+
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
@@ -30,3 +38,6 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 });
+
+
+Route::get('/book-service', ServiceSlotBooking::class);

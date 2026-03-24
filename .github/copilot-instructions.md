@@ -15,6 +15,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - livewire/flux (FLUXUI_FREE) - v2
 - livewire/livewire (LIVEWIRE) - v3
 - livewire/volt (VOLT) - v1
+- statamic/cms (STATAMIC) - v5
 - laravel/mcp (MCP) - v0
 - laravel/pint (PINT) - v1
 - laravel/sail (SAIL) - v1

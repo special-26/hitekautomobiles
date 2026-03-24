@@ -35,7 +35,7 @@
                 </button>
                 <div>
                     <h4 class="text-gray-800">we are always 24/7</h4>
-                    <h3 class="text-primary font-bold">+1(212)255511</h3>
+                    <h3 class="text-primary font-bold">+91-9216111868</h3>
                 </div>
             </div>
             <button class="border border-primary rounded-full text-primary font-bold px-5 py-2 flex items-center justify-between gap-2 hover:bg-primary hover:text-white cursor-pointer">
