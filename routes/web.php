@@ -15,6 +15,11 @@ Route::get('/team/nagender-sharma', function () {
     return view('nagender');
 })->name('nagender');
 
+// Claim Docs
+Route::get('/doca/bodyshop-cliam-docs', function () {
+    return view('bodyshop-claim-docs');
+})->name('bodyshop-claim-docs');
+
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

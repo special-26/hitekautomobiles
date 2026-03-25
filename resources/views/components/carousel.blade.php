@@ -56,13 +56,13 @@
 }" x-init="autoplay" class="relative w-full overflow-hidden">
    
     <!-- slides -->
-    <!-- Change min-h-[50svh] to your preferred height size -->
-    <div class="relative min-h-[99svh]">
+    <!-- Change min-h-[50svh] to your preferred height size min-h-[99svh] -->
+    <div class="relative md-h-[99svh] h-[40vh]">
         <template x-for="(slide, index) in slides">
             <div x-cloak x-show="currentSlideIndex == index + 1" class="absolute inset-0" x-transition.opacity.duration.1000ms>
                 
                 <!-- Title and description -->
-                <div class="absolute inset-0 z-10 flex flex-col items-start justify-center gap-2 bg-linear-to-r from-neutral-950 to-transparent px-24 text-left">
+                <div class="absolute inset-0 z-10 hidden md:flex flex-col items-start justify-center gap-2 bg-linear-to-r from-neutral-950 to-transparent px-24 text-left">
                     <h3 class="w-[60%] text-balance text-[3em] font-bold text-white" x-text="slide.title" x-bind:aria-describedby="'slide' + (index + 1) + 'Description'"></h3>
                     <p class="w-[60%] text-pretty text-2xl font-bold text-neutral-300" x-text="slide.description" x-bind:id="'slide' + (index + 1) + 'Description'"></p>
                 </div>

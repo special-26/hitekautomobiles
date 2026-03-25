@@ -1,7 +1,7 @@
 <nav class="bg-white fixed w-full z-20 top-0 start-0 border-b border-default">
-    <div class="max-w-screen-2xl flex flex-wrap items-center justify-between mx-auto py-4 px-12">
-        <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src="images/logo.jpg" class="h-12" alt="Flowbite Logo">
+    <div class="max-w-screen-2xl flex flex-wrap items-center justify-between mx-auto py-4 px-3 md:px-12">
+        <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
+            <img src="{{ asset('images/logo.jpg') }}" class="h-12" alt="Flowbite Logo">
         </a>
         {{-- <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
             <button type="button" class=" bg-primary box-border border border-transparent focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-lg text-sm px-3 py-2 focus:outline-none">Get started</button>
@@ -28,7 +28,7 @@
             </ul>
         </div>
 
-        <div class="md:order-2 flex items-center justify-between gap-8">
+        <div class="md:order-2 hidden md:flex items-center justify-between gap-8">
             <div class="flex items-center justify-center gap-3">
                 <button class="rounded-full bg-primary text-white w-11 h-11 flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="M19.95 21q-3.125 0-6.175-1.362t-5.55-3.863t-3.862-5.55T3 4.05q0-.45.3-.75t.75-.3H8.1q.35 0 .625.238t.325.562l.65 3.5q.05.4-.025.675T9.4 8.45L6.975 10.9q.5.925 1.187 1.787t1.513 1.663q.775.775 1.625 1.438T13.1 17l2.35-2.35q.225-.225.588-.337t.712-.063l3.45.7q.35.1.575.363T21 15.9v4.05q0 .45-.3.75t-.75.3"/></svg>

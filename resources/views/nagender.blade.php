@@ -1,4 +1,17 @@
 <x-layouts.app>
+
+    <x-slot name="title">
+        Rahul Sharma - Service Advisor
+    </x-slot>
+
+    <x-slot name="meta">
+        <meta property="og:title" content="Rahul Sharma - Service Advisor | Hitek Automobiles">
+        <meta property="og:description" content="📞 98XXXXXXX | Your dedicated service advisor">
+        <meta property="og:image" content="{{ asset('images/vb.png') }}">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:type" content="profile">
+    </x-slot>
+
     <x-mobile-navbar></x-mobile-navbar>
 
     <div class="w-full h-full bg-gray-50">
@@ -23,16 +36,15 @@
                 </button>
                 <button class="border border-gray-300 shadow-lg rounded-xl text-gray-700 w-full py-3 mt-5">
                     <a href="https://maps.app.goo.gl/VLQVu9eaikCVyoat6" target="_blank" class="flex items-center justify-center gap-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-600" viewBox="0 0 24 24"><!-- Icon from Material Design Icons by Pictogrammers - https://github.com/Templarian/MaterialDesign/blob/master/LICENSE --><path fill="currentColor" d="M12 2c3.31 0 6 2.66 6 5.95C18 12.41 12 19 12 19S6 12.41 6 7.95C6 4.66 8.69 2 12 2m0 4a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2m8 13c0 2.21-3.58 4-8 4s-8-1.79-8-4c0-1.29 1.22-2.44 3.11-3.17l.64.91C6.67 17.19 6 17.81 6 18.5c0 1.38 2.69 2.5 6 2.5s6-1.12 6-2.5c0-.69-.67-1.31-1.75-1.76l.64-.91C18.78 16.56 20 17.71 20 19"/></svg>
-                        Get Workshop Direction
+                        📍 Get Workshop Direction
                     </a>
                 </button>
             </div>
 
-            {{-- <div class="card-actions px-5 py-5 border-t">
+            <div class="card-actions px-5 py-5 border-t">
                 <h2 class="text-gray-800 text-xl font-bold mb-2">Map Location</h2>
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3430.437418242554!2d76.80559837500729!3d30.706101174597134!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fed9e85891a69%3A0xddf568be8cf5b0c7!2sHitek%20Automobiles!5e0!3m2!1sen!2sin!4v1774345510229!5m2!1sen!2sin" width="600" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-            </div> --}}
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3430.437418242554!2d76.80559837500729!3d30.706101174597134!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fed9e85891a69%3A0xddf568be8cf5b0c7!2sHitek%20Automobiles!5e0!3m2!1sen!2sin!4v1774345510229!5m2!1sen!2sin" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
         </div>
     </div>
 </x-layouts.app>

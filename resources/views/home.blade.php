@@ -4,7 +4,7 @@
     <x-carousel></x-carousel>
 
     <section class="w-full py-12">
-        <div class="grid grid-cols-3 px-12 items-center">
+        <div class="grid md:grid-cols-3 px-6 md:px-12 items-center">
             <div class="">
                 <h4 class="text-primary uppercase font-bold">/ Why choose us? /</h4>
                 <h2 class="text-[3.5em] font-bold text-gray-800">What makes us <br/> <span class="text-primary">different?</span></h2>
@@ -93,7 +93,7 @@
     </div>
 
     {{-- Our service --}}
-    <section class="w-full p-12">
+    <section class="w-full p-6 md:p-12">
         <div class="mb-12 ">
             <h4 class="text-primary uppercase font-bold">/ Our Service /</h4>
             <h2 class="text-[3.5em] font-bold text-gray-800 leading-none">We offer a <span class="text-primary">wide range</span> <br/> of car serives</h2>
@@ -182,7 +182,7 @@
     </section>
 
     {{-- Testimonials --}}
-    <section class="w-full p-12">
+    <section class="w-full p-6 md:p-12">
         <div class="mb-12 ">
             <h4 class="text-primary uppercase font-bold">/ Testimonials /</h4>
             <h2 class="text-[3.5em] font-bold text-gray-800 leading-none">What our <span class="text-primary">cleints say</span> <br/> about us</h2>
