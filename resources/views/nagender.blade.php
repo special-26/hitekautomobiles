@@ -1,12 +1,16 @@
 <x-layouts.app>
 
     <x-slot name="title">
-        Rahul Sharma - Service Advisor
+        Nagender Sharma - Body Shop Advisor
     </x-slot>
 
     <x-slot name="meta">
-        <meta property="og:title" content="Rahul Sharma - Service Advisor | Hitek Automobiles">
-        <meta property="og:description" content="📞 98XXXXXXX | Your dedicated service advisor">
+        <meta property="og:title" content="Nagender Sharma - Body Shop Advisor | Hitek Automobiles">
+        <meta property="og:description" content="
+            📞 +919216721868 | 
+            👨‍🔧 Body Shop Advisor
+            📍 Hitek Automobiles, Chandigarh"
+        >
         <meta property="og:image" content="{{ asset('images/vb.png') }}">
         <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:type" content="profile">
@@ -37,6 +41,12 @@
                 <button class="border border-gray-300 shadow-lg rounded-xl text-gray-700 w-full py-3 mt-5">
                     <a href="https://maps.app.goo.gl/VLQVu9eaikCVyoat6" target="_blank" class="flex items-center justify-center gap-3">
                         📍 Get Workshop Direction
+                    </a>
+                </button>
+                <button class="border border-gray-300 shadow-lg rounded-xl text-gray-700 w-full py-3 mt-5">
+                    <a href="https://wa.me/?text={{ urlencode('👨‍🔧 Nagender Sharma - Body Shop Advisor: '.url()->current()) }}" target="_blank" class="flex items-center justify-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" fill-rule="evenodd" d="M13.803 5.333c0-1.84 1.5-3.333 3.348-3.333A3.34 3.34 0 0 1 20.5 5.333c0 1.841-1.5 3.334-3.349 3.334a3.35 3.35 0 0 1-2.384-.994l-4.635 3.156a3.34 3.34 0 0 1-.182 1.917l5.082 3.34a3.35 3.35 0 0 1 2.12-.753a3.34 3.34 0 0 1 3.348 3.334C20.5 20.507 19 22 17.151 22a3.34 3.34 0 0 1-3.348-3.333a3.3 3.3 0 0 1 .289-1.356L9.05 14a3.35 3.35 0 0 1-2.202.821A3.34 3.34 0 0 1 3.5 11.487a3.34 3.34 0 0 1 3.348-3.333c1.064 0 2.01.493 2.623 1.261l4.493-3.059a3.3 3.3 0 0 1-.161-1.023" clip-rule="evenodd"/></svg>
+                        Share Profile
                     </a>
                 </button>
             </div>

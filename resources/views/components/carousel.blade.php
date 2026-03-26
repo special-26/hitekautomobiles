@@ -57,7 +57,7 @@
    
     <!-- slides -->
     <!-- Change min-h-[50svh] to your preferred height size min-h-[99svh] -->
-    <div class="relative md-h-[99svh] h-[40vh]">
+    <div class="relative md:h-[99svh] h-[40vh]">
         <template x-for="(slide, index) in slides">
             <div x-cloak x-show="currentSlideIndex == index + 1" class="absolute inset-0" x-transition.opacity.duration.1000ms>
                 
