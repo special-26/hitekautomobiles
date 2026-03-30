@@ -8,12 +8,10 @@ use App\Livewire\ServiceSlotBooking;
 Route::get('/', function () {
     return view('home');
 })->name('home');
-Route::get('/team', function () {
-    return view('team');
-})->name('team');
-Route::get('/team/nagender-sharma', function () {
-    return view('nagender');
-})->name('nagender');
+Route::get('/team', function () { return view('team');})->name('team');
+Route::get('/team/nagender-sharma', function () { return view('nagender');})->name('nagender');
+Route::get('/team/ankit-sandhu', function () { return view('teams/ankit');})->name('ankit');
+Route::get('/team/basant-joshi', function () { return view('teams.basant');})->name('basant');
 
 // Claim Docs
 Route::get('/doca/bodyshop-cliam-docs', function () {

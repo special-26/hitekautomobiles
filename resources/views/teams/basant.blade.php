@@ -1,17 +1,17 @@
 <x-layouts.app>
 
     <x-slot name="title">
-        Nagender Sharma - Body Shop Advisor
+        Basant Joshi - Bodyshop Incharge
     </x-slot>
 
     <x-slot name="meta">
-        <meta property="og:title" content="Nagender Sharma - Body Shop Advisor | Hitek Automobiles">
+        <meta property="og:title" content="Basant Joshi - Bodyshop Incharge | Hitek Automobiles">
         <meta property="og:description" content="
-            📞 +919216721868 | 
-            👨‍🔧 Body Shop Advisor
+            📞 +919915991038 | 
+            👨‍🔧 Bodyshop Incharge
             📍 Hitek Automobiles, Chandigarh"
         >
-        <meta property="og:image" content="{{ asset('images/nagender.jpeg') }}">
+        <meta property="og:image" content="{{ asset('images/basant.jpeg') }}">
         <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:type" content="profile">
     </x-slot>
@@ -23,12 +23,12 @@
             <div class="header-card relative">
                 <img src="{{ asset('images/slide-2.jpg') }}" alt="hitek automobiles" class="h-[30vh] w-full object-cover">
                 <div class="absolute -bottom-16 left-0 right-0 flex items-center justify-center">
-                    <img src="{{ asset('images/nagender.jpeg') }}" alt="" class="h-40 w-40 rounded-3xl object-cover border-4 border-white">
+                    <img src="{{ asset('images/basant.jpeg') }}" alt="" class="h-40 w-40 rounded-3xl object-cover border-4 border-white">
                 </div>
             </div>
             <div class="card-details mt-20 px-6 text-center">
-                <h4 class="text-gray-900 font-bold text-xl">Nagender Sharma</h4>
-                <h5 class="text-gray-700 text-sm">Body Shop Advisor</h5>
+                <h4 class="text-gray-900 font-bold text-xl">Basant Joshi</h4>
+                <h5 class="text-gray-700 text-sm">Bodyshop Incharge</h5>
             </div>
 
             <div class="card-links p-6 max-w-sm mx-auto">
