@@ -23,12 +23,12 @@
                 <a href="{{ route('basant') }}" class="absolute bottom-0 left-0 right-0 p-2">
                     <div class="bg-white/95 rounded-xl p-3">
                         <h4 class="text-gray-900 font-bold text-lg">Basant Joshi</h4>
-                        <h5 class="text-gray-700 text-sm">Bodyshop Incharge</h5>
+                        <h5 class="text-gray-700 text-sm">Body Shop Incharge</h5>
                     </div>
                 </a>
             </div>
             <div class="card h-[320px] rounded-2xl overflow-hidden relative shadow-xl border-4">
-                <img src="{{ asset('images/nagender.jpeg') }}" alt="" class="object-cover w-full h-full">
+                <img src="{{ asset('images/nagender.jpg') }}" alt="" class="object-cover w-full h-full">
                 <a href="{{ route('nagender') }}" class="absolute bottom-0 left-0 right-0 p-2">
                     <div class="bg-white/95 rounded-xl p-3">
                         <h4 class="text-gray-900 font-bold text-lg">Nagender Sharma</h4>
@@ -37,7 +37,7 @@
                 </a>
             </div>
             <div class="card h-[320px] rounded-2xl overflow-hidden relative shadow-xl border-4">
-                <img src="{{ asset('images/ankit.jpeg') }}" alt="" class="object-cover w-full h-full">
+                <img src="{{ asset('images/ankit.jpg') }}" alt="" class="object-cover w-full h-full">
                 <a href="{{ route('ankit') }}" class="absolute bottom-0 left-0 right-0 p-2">
                     <div class="bg-white/95 rounded-xl p-3">
                         <h4 class="text-gray-900 font-bold text-lg">Ankit Sandhu</h4>
@@ -50,6 +50,26 @@
 
         <section class="max-w-7xl mx-auto mt-12">
             <h1 class="text-gray-800 font-bold text-3xl underline">Drivers</h1>
+            <div class="grid md:grid-cols-4 gap-5">
+                <div class="card h-[320px] rounded-2xl overflow-hidden relative shadow-xl border-4">
+                    <img src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg" alt="" class="object-cover w-full h-full">
+                    <div class="absolute bottom-0 left-0 right-0 p-2">
+                        <div class="bg-white/95 rounded-xl p-3">
+                            <h4 class="text-gray-900 font-bold text-lg">Jony Singh</h4>
+                            <h5 class="text-gray-700 text-sm">Field Officer</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="card h-[320px] rounded-2xl overflow-hidden relative shadow-xl border-4">
+                    <img src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg" alt="" class="object-cover w-full h-full">
+                    <div class="absolute bottom-0 left-0 right-0 p-2">
+                        <div class="bg-white/95 rounded-xl p-3">
+                            <h4 class="text-gray-900 font-bold text-lg">Rajesh Sood</h4>
+                            <h5 class="text-gray-700 text-sm">Driver</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
     </div>
 </x-layouts.app>

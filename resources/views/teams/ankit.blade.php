@@ -11,7 +11,7 @@
             👨‍🔧 Service Advisor
             📍 Hitek Automobiles, Chandigarh"
         >
-        <meta property="og:image" content="{{ asset('images/ankit.jpeg') }}">
+        <meta property="og:image" content="{{ asset('images/ankit.jpg') }}">
         <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:type" content="profile">
     </x-slot>
@@ -23,7 +23,7 @@
             <div class="header-card relative">
                 <img src="{{ asset('images/slide-2.jpg') }}" alt="hitek automobiles" class="h-[30vh] w-full object-cover">
                 <div class="absolute -bottom-16 left-0 right-0 flex items-center justify-center">
-                    <img src="{{ asset('images/ankit.jpeg') }}" alt="" class="h-40 w-40 rounded-3xl object-cover border-4 border-white">
+                    <img src="{{ asset('images/ankit.jpg') }}" alt="" class="h-40 w-40 rounded-3xl object-cover border-4 border-white">
                 </div>
             </div>
             <div class="card-details mt-20 px-6 text-center">
