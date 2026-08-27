@@ -76,8 +76,13 @@ class RoleSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        $storeManager = Role::firstOrCreate([
-            'name' => 'Store Manager',
+        $autoPartsStoreManager = Role::firstOrCreate([
+            'name' => 'Auto Parts Store Manager',
+            'guard_name' => 'web',
+        ]);
+
+        $generalStoreManager = Role::firstOrCreate([
+            'name' => 'General Store Manager',
             'guard_name' => 'web',
         ]);
 
@@ -94,152 +99,98 @@ class RoleSeeder extends Seeder
 
         /*
         |--------------------------------------------------------------------------
-        | Assign Permissions
+        | Mechanic Coordinator
         |--------------------------------------------------------------------------
         */
+        $mechanicCoordinator = Role::firstOrCreate([
+            'name' => 'Mechanic Coordinator',
+            'guard_name' => 'web',
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Customers
+        |--------------------------------------------------------------------------
+        */
+        $customer = Role::firstOrCreate([
+            'name' => 'Customer',
+            'guard_name' => 'web',
+        ]);
+
+        /*
+|--------------------------------------------------------------------------
+| Assign Permissions
+|--------------------------------------------------------------------------
+*/
 
         // Super Admin gets everything.
-        $superAdmin->syncPermissions(
-            Permission::all()
-        );
+        $superAdmin->syncPermissions([
+            'owner.dashboard.view',
+            'owner.statistics.view',
+            'owner.reports.view',
+            'owner.activity.view',
+            'owner.admins.manage',
+        ]);
 
         // Admin
         $admin->syncPermissions([
-            'view dashboard',
+            'employees.view',
+            'employees.create',
+            'employees.update',
+            'employees.status.update',
 
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
+            'roles.view',
 
-            'view customers',
-            'create customers',
-            'edit customers',
-            'delete customers',
-
-            'view vehicles',
-            'create vehicles',
-            'edit vehicles',
-            'delete vehicles',
-
-            'view job cards',
-            'create job cards',
-            'edit job cards',
-
-            'view bays',
-            'manage bays',
-            'assign technicians',
-
-            'view service status',
-            'update service status',
-
-            'view inventory',
-            'manage inventory',
-
-            'view payments',
-            'create payments',
-            'manage payments',
-
-            'view reports',
-            'view daily reports',
-
-            'view bookings',
-            'create bookings',
-            'edit bookings',
-            'cancel bookings',
+            'bays.view',
+            'bays.create',
+            'bays.update',
+            'bays.status.update',
         ]);
 
         // Advisor
-        $advisor->syncPermissions([
-            'view dashboard',
-
-            'view customers',
-            'create customers',
-            'edit customers',
-
-            'view vehicles',
-            'create vehicles',
-            'edit vehicles',
-
-            'view job cards',
-            'create job cards',
-            'edit job cards',
-
-            'view service status',
-            'update service status',
-
-            'view bookings',
-            'create bookings',
-            'edit bookings',
-
-            'view payments',
-        ]);
+        $advisor->syncPermissions([]);
 
         // Floor Manager
-        $floorManager->syncPermissions([
-            'view dashboard',
-
-            'view customers',
-            'view vehicles',
-
-            'view job cards',
-            'edit job cards',
-
-            'view bays',
-            'manage bays',
-            'assign technicians',
-
-            'view service status',
-            'update service status',
-
-            'view reports',
-        ]);
+        $floorManager->syncPermissions([]);
 
         // Mechanic
-        $mechanic->syncPermissions([
-            'view dashboard',
+        $mechanic->syncPermissions([]);
 
-            'view job cards',
+        // AutoPart Store Manager
+        $autoPartsStoreManager->syncPermissions([
 
-            'view service status',
-            'update service status',
+            // Auto Parts
+            'parts.view',
+            'parts.manage',
+            'parts.receive',
+            'parts.issue',
+            'parts.return',
+            'parts.adjust',
+            'parts.suppliers.manage',
         ]);
+        // General Store Manager
+        $generalStoreManager->syncPermissions([
 
-        // Store Manager
-        $storeManager->syncPermissions([
-            'view dashboard',
-
-            'view inventory',
-            'manage inventory',
-
-            'view job cards',
-
-            'view reports',
+            // General Inventory
+            'inventory.view',
+            'inventory.manage',
+            'inventory.receive',
+            'inventory.issue',
+            'inventory.return',
+            'inventory.adjust',
         ]);
 
         // Customer Support
-        $customerSupport->syncPermissions([
-            'view dashboard',
+        $customerSupport->syncPermissions([]);
 
-            'view customers',
-            'create customers',
-            'edit customers',
+        $mechanicCoordinator->syncPermissions([]);
 
-            'view vehicles',
-            'create vehicles',
-            'edit vehicles',
-
-            'view job cards',
-            'create job cards',
-            'edit job cards',
-
-            'view service status',
-
-            'view bookings',
-            'create bookings',
-            'edit bookings',
-
-            'view payments',
+        $customer->syncPermissions([
+            'customers.view',
+            'customers.update',
+            'vehicles.view',
+            'vehicles.create',
+            'vehicles.update',
         ]);
 
         /*
@@ -250,7 +201,7 @@ class RoleSeeder extends Seeder
 
         $superAdminUser = User::firstOrCreate(
             [
-                'email' => 'admin@hitekautomobiles.com',
+                'email' => 'superadmin@hitekautomobiles.com',
             ],
             [
                 'name' => 'Hitek Automobiles',
@@ -258,8 +209,18 @@ class RoleSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+        $AdminUser = User::firstOrCreate(
+            [
+                'email' => 'admin@hitekautomobiles.com',
+            ],
+            [
+                'name' => 'Hitek Admin',
+                'password' => 'password',
+                'is_active' => true,
+            ]
+        );
 
         $superAdminUser->syncRoles([$superAdmin]);
-        
+        $AdminUser->syncRoles([$admin]);
     }
 }

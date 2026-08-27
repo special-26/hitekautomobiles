@@ -11,10 +11,11 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function login(LoginRequest $request){
+    public function login(LoginRequest $request)
+    {
         $credentials = $request->validated();
 
-        if(!Auth::attempt($credentials)){
+        if (!Auth::attempt($credentials)) {
             return ApiResponse::error(
                 'Invalid email or password.',
                 null,
@@ -48,24 +49,29 @@ class AuthController extends Controller
             ],
             'Login successful.'
         );
-
     }
 
-    public function user(Request $request): JsonResponse {
+    public function user(Request $request): JsonResponse
+    {
         $user = $request->user();
 
-        return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'is_active' => $user->is_active
-            ],
+        return ApiResponse::success([
+            'user' => $user,
             'roles' => $user->getRoleNames(),
-            'permissions' => $user
-                ->getAllPermissions()
-                ->pluck('name')
-                ->values()
-        ]);
+            'permissions' => $user->getAllPermissions()->pluck('name'),
+        ], 'Authenticated user.');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return ApiResponse::success(
+            null,
+            'Logout successful.'
+        );
     }
 }

@@ -15,60 +15,83 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
 
+            // Owner / Super Admin
+            'owner.dashboard.view',
+            'owner.statistics.view',
+            'owner.reports.view',
+            'owner.activity.view',
+            'owner.admins.manage',
+
             // Dashboard
-            'view dashboard',
 
             // Users
-            'view users',
-            'create users',
-            'edit users',
-            'delete users',
+
 
             // Customers
-            'view customers',
-            'create customers',
-            'edit customers',
-            'delete customers',
+            'customers.view',
+            'customers.create',
+            'customers.update',
+            'customers.status.update',
 
             // Vehicles
-            'view vehicles',
-            'create vehicles',
-            'edit vehicles',
-            'delete vehicles',
+            'vehicles.view',
+            'vehicles.create',
+            'vehicles.update',
+            'vehicles.status.update',
 
             // Job Cards
-            'view job cards',
-            'create job cards',
-            'edit job cards',
-            'delete job cards',
+            'job-cards.view',
+            'job-cards.create',
+            'job-cards.update',
+            'job-cards.status.update',
+            'job-cards.assign',
 
-            // Workshop / Bays
-            'view bays',
-            'manage bays',
-            'assign technicians',
+            // Bays
+            'bays.view',
+            'bays.create',
+            'bays.update',
+            'bays.status.update',
 
             // Service Status
-            'view service status',
-            'update service status',
+
 
             // Inventory
-            'view inventory',
-            'manage inventory',
+
+
+            // Auto Parts Inventory
+            'parts.view',
+            'parts.manage',
+            'parts.receive',
+            'parts.issue',
+            'parts.return',
+            'parts.adjust',
+            'parts.suppliers.manage',
+
+            // General Inventory
+            'inventory.view',
+            'inventory.manage',
+            'inventory.receive',
+            'inventory.issue',
+            'inventory.return',
+            'inventory.adjust',
 
             // Payments
-            'view payments',
-            'create payments',
-            'manage payments',
+
 
             // Reports
-            'view reports',
-            'view daily reports',
+
 
             // Bookings
-            'view bookings',
-            'create bookings',
-            'edit bookings',
-            'cancel bookings',
+
+
+            // Employee Management
+            'employees.view',
+            'employees.create',
+            'employees.update',
+            'employees.status.update',
+
+            // Role Management
+            'roles.view',
 
         ];
 

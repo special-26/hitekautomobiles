@@ -19,6 +19,17 @@
                 :placeholder="__('Full name')"
             />
 
+             <!-- Phone -->
+            <flux:input
+                name="phone"
+                :label="__('Phone number')"
+                :value="old('phone')"
+                type="tel"
+                required
+                autocomplete="tel"
+                placeholder="9876543210"
+            />
+
             <!-- Email Address -->
             <flux:input
                 name="email"

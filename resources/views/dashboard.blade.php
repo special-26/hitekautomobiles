@@ -1,18 +1,57 @@
 <x-layouts.app :title="__('Dashboard')">
-    <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
-        <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-                <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
+    <x-main-navbar></x-main-navbar>
+
+    <div class="flex flex-col gap-6 bg-gray-800 pt-20">
+
+        <div>
+            <div size="xl">
+                Welcome, {{ auth()->user()->name }}
             </div>
-            <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-                <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
-            </div>
-            <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-                <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
+
+            <div class="mt-2">
+                Customer Portal
             </div>
         </div>
-        <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-            <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
+
+        <div class="grid gap-4 md:grid-cols-3">
+
+            <div>
+                <div size="lg">
+                    Customer Code
+                </div>
+
+                <div class="mt-2">
+                    {{ auth()->user()->customer?->customer_code ?? 'N/A' }}
+                </div>
+            </div>
+
+            <div>
+                <div size="lg">
+                    Vehicles
+                </div>
+
+                <div class="mt-2">
+                    0
+                </div>
+            </div>
+
+            <div>
+                <div size="lg">
+                    Service History
+                </div>
+
+                <div class="mt-2">
+                    0
+                </div>
+            </div>
+
         </div>
+
+        <div>
+            <a href="{{ route('customer.profile') }}">Go to Customer Profile</a>
+        </div>
+
     </div>
+
+    <x-main-footer />
 </x-layouts.app>

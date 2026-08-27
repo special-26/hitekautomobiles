@@ -9,6 +9,14 @@ class Role extends SpatieRole
 {
     use HasUuids;
 
+    protected $table = 'roles';
     protected $primaryKey = 'uuid';
+    public $incrementing = false;
 
+    protected $keyType = 'string';
+
+    protected $fillable = [
+        'name',
+        'guard_name',
+    ];
 }

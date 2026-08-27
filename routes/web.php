@@ -8,10 +8,18 @@ use App\Livewire\ServiceSlotBooking;
 Route::get('/', function () {
     return view('home');
 })->name('home');
-Route::get('/team', function () { return view('team');})->name('team');
-Route::get('/team/nagender-sharma', function () { return view('nagender');})->name('nagender');
-Route::get('/team/ankit-sandhu', function () { return view('teams/ankit');})->name('ankit');
-Route::get('/team/basant-joshi', function () { return view('teams.basant');})->name('basant');
+Route::get('/team', function () {
+    return view('team');
+})->name('team');
+Route::get('/team/nagender-sharma', function () {
+    return view('nagender');
+})->name('nagender');
+Route::get('/team/ankit-sandhu', function () {
+    return view('teams/ankit');
+})->name('ankit');
+Route::get('/team/basant-joshi', function () {
+    return view('teams.basant');
+})->name('basant');
 
 // Claim Docs
 Route::get('/doca/bodyshop-cliam-docs', function () {
@@ -22,6 +30,28 @@ Route::get('/doca/bodyshop-cliam-docs', function () {
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+// Customer Business Profile
+Volt::route(
+    'customer/profile',
+    'customer.profile'
+)
+    ->middleware(['auth', 'verified'])
+    ->name('customer.profile');
+// Customer - Manage Vehicle
+Volt::route(
+    'customer/vehicles',
+    'customer.vehicles'
+)
+    ->middleware(['auth', 'verified'])
+    ->name('customer.vehicles');
+// Book Service
+Volt::route('customer/book-service', 'customer.book-service')
+    ->middleware(['auth', 'verified'])
+    ->name('customer.book-service');
+// My Bookings
+Volt::route('customer/bookings', 'customer.bookings')
+    ->middleware(['auth', 'verified'])
+    ->name('customer.bookings');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
