@@ -24,11 +24,6 @@ return new class extends Migration
                 ->constrained('vehicles')
                 ->cascadeOnDelete();
 
-            $table->foreignId('service_booking_id')
-                ->nullable()
-                ->constrained('service_bookings')
-                ->nullOnDelete();
-
             $table->foreignId('advisor_id')
                 ->nullable()
                 ->constrained('employees')
@@ -58,7 +53,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['customer_id', 'vehicle_id']);
-            $table->index('service_booking_id');
+            
             $table->index('advisor_id');
             $table->index('bay_id');
             $table->index(['status', 'priority']);

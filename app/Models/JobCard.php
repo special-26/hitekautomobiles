@@ -16,7 +16,6 @@ class JobCard extends Model
         'job_card_number',
         'customer_id',
         'vehicle_id',
-        'service_booking_id',
         'advisor_id',
         'bay_id',
         'complaint',
@@ -40,11 +39,6 @@ class JobCard extends Model
     public function vehicle(): BelongsTo
     {
         return $this->belongsTo(Vehicle::class);
-    }
-
-    public function serviceBooking(): BelongsTo
-    {
-        return $this->belongsTo(ServiceBooking::class);
     }
 
     public function advisor(): BelongsTo
