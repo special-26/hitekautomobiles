@@ -124,16 +124,16 @@ class DevelopmentSeeder extends Seeder
         */
 
         $bay = Bay::firstOrCreate(
-        [
-            'code' => 'BAY-01',
-        ],
-        [
-            'name' => 'Bay 01',
-            'department_id' => $department->id,
-            'type' => 'General',
-            'is_active' => true,
-        ]
-    );
+            [
+                'code' => 'BAY-01',
+            ],
+            [
+                'name' => 'Bay 01',
+                'department_id' => $department->id,
+                'type' => 'General',
+                'is_active' => true,
+            ]
+        );
 
         /*
         |--------------------------------------------------------------------------
@@ -141,22 +141,22 @@ class DevelopmentSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-        JobCard::firstOrCreate(
-            [
-                'job_card_number' => 'JC-000001',
-            ],
-            [
-                'customer_id' => $customer->id,
-                'vehicle_id' => $vehicle->id,
-                'advisor_id' => $employee->id,
-                'bay_id' => $bay->id,
-                'complaint' => 'Engine making unusual noise.',
-                'work_description' => 'Inspect engine and diagnose the issue.',
-                'estimated_cost' => 2500,
-                'status' => 'open',
-                'priority' => 'normal',
-            ]
-        );
+        // JobCard::firstOrCreate(
+        //     [
+        //         'job_card_number' => 'JC-000001',
+        //     ],
+        //     [
+        //         'customer_id' => $customer->id,
+        //         'vehicle_id' => $vehicle->id,
+        //         'advisor_id' => $employee->id,
+        //         'bay_id' => $bay->id,
+        //         'complaint' => 'Engine making unusual noise.',
+        //         'work_description' => 'Inspect engine and diagnose the issue.',
+        //         'estimated_cost' => 2500,
+        //         'status' => 'open',
+        //         'priority' => 'normal',
+        //     ]
+        // );
 
 
     }

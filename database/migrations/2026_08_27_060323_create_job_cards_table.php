@@ -14,49 +14,67 @@ return new class extends Migration
         Schema::create('job_cards', function (Blueprint $table) {
             $table->id();
 
-            $table->string('job_card_number')->unique();
+            $table->string('job_card_number')
+                ->unique();
 
+            // Customer
             $table->foreignId('customer_id')
                 ->constrained('customers')
-                ->cascadeOnDelete();
+                ->restrictOnDelete();
 
+            // Vehicle
             $table->foreignId('vehicle_id')
                 ->constrained('vehicles')
-                ->cascadeOnDelete();
+                ->restrictOnDelete();
 
-            $table->foreignId('advisor_id')
-                ->nullable()
-                ->constrained('employees')
-                ->nullOnDelete();
+            // Department
+            $table->foreignId('department_id')
+                ->constrained('departments')
+                ->restrictOnDelete();
 
+            // Bay
             $table->foreignId('bay_id')
                 ->nullable()
                 ->constrained('bays')
                 ->nullOnDelete();
 
-            $table->text('complaint')->nullable();
+            // Advisor
+            $table->foreignId('advisor_id')
+                ->nullable()
+                ->constrained('employees')
+                ->nullOnDelete();
 
-            $table->text('work_description')->nullable();
+            // Customer complaint / requested work
+            $table->text('complaint');
 
+            $table->text('customer_notes')
+                ->nullable();
+
+            // Estimated cost
             $table->decimal('estimated_cost', 12, 2)
                 ->nullable();
 
+            // Estimated completion
             $table->timestamp('estimated_completion_at')
                 ->nullable();
 
+            // Job Card status
             $table->string('status')
-                ->default('open');
+                ->default('pending');
 
-            $table->string('priority')
-                ->default('normal');
+            $table->boolean('is_active')
+                ->default(true);
 
             $table->timestamps();
 
-            $table->index(['customer_id', 'vehicle_id']);
-            
-            $table->index('advisor_id');
+            // Frequently queried columns
+            $table->index('customer_id');
+            $table->index('vehicle_id');
+            $table->index('department_id');
             $table->index('bay_id');
-            $table->index(['status', 'priority']);
+            $table->index('advisor_id');
+            $table->index('status');
+            $table->index('is_active');
         });
     }
 
