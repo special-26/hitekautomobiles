@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): JsonResponse
     {
         $credentials = $request->validated();
 
@@ -22,8 +22,6 @@ class AuthController extends Controller
                 401
             );
         }
-
-        $request->session()->regenerate();
 
         $user = Auth::user();
 
@@ -37,15 +35,15 @@ class AuthController extends Controller
             );
         }
 
-        // $user->update([
-        //     'last_login_at' => now(),
-        // ]);
+        $request->session()->regenerate();
 
         return ApiResponse::success(
             [
                 'user' => $user,
                 'roles' => $user->getRoleNames(),
-                'permissions' => $user->getAllPermissions()->pluck('name'),
+                'permissions' => $user
+                    ->getAllPermissions()
+                    ->pluck('name'),
             ],
             'Login successful.'
         );

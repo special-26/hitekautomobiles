@@ -17,12 +17,43 @@ class EmployeeController extends Controller
      */
     public function index(Request $request)
     {
-        $employees = Employee::with([
-            'user:id,name,email,is_active',
-            'department:id,name',
-        ])
+        $employees = Employee::query()
+            ->with([
+                'user:id,name,email,is_active',
+                'department:id,name',
+            ])
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->string('search')->trim();
+
+                $query->where(function ($query) use ($search) {
+                    $query
+                        ->where('employee_code', 'ilike', "%{$search}%")
+                        ->orWhere('phone', 'ilike', "%{$search}%")
+                        ->orWhere('designation', 'ilike', "%{$search}%")
+                        ->orWhereHas('user', function ($query) use ($search) {
+                            $query
+                                ->where('name', 'ilike', "%{$search}%")
+                                ->orWhere('email', 'ilike', "%{$search}%");
+                        });
+                });
+            })
+            ->when(
+                $request->filled('department_id'),
+                fn($query) => $query->where(
+                    'department_id',
+                    $request->department_id
+                )
+            )
+            ->when(
+                $request->filled('status'),
+                fn($query) => $query->where(
+                    'status',
+                    $request->status
+                )
+            )
             ->latest()
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         return ApiResponse::success(
             $employees,
@@ -56,7 +87,14 @@ class EmployeeController extends Controller
             'phone' => ['nullable', 'string', 'max:20'],
             'joining_date' => ['nullable', 'date'],
 
-            'role' => ['required', 'string'],
+            'role' => [
+                'required',
+                'string',
+                Rule::exists('roles', 'name')
+                    ->where(function ($query) {
+                        $query->where('name', '!=', 'Super Admin');
+                    }),
+            ],
         ]);
 
         $employee = DB::transaction(function () use ($validated) {
@@ -102,6 +140,7 @@ class EmployeeController extends Controller
     {
         $employee->load([
             'user:id,name,email,is_active',
+            'user.roles:uuid,name,guard_name',
             'department:id,name',
         ]);
 
@@ -117,10 +156,9 @@ class EmployeeController extends Controller
     public function update(Request $request, Employee $employee)
     {
         $validated = $request->validate([
-            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
 
             'email' => [
-                'sometimes',
                 'required',
                 'email',
                 'max:255',
@@ -129,7 +167,6 @@ class EmployeeController extends Controller
             ],
 
             'employee_code' => [
-                'sometimes',
                 'required',
                 'string',
                 'max:50',
@@ -138,7 +175,6 @@ class EmployeeController extends Controller
             ],
 
             'department_id' => [
-                'sometimes',
                 'required',
                 'exists:departments,id',
             ],

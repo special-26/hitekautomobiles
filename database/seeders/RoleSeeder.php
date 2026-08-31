@@ -125,39 +125,105 @@ class RoleSeeder extends Seeder
 
         // Super Admin gets everything.
         $superAdmin->syncPermissions([
-            'owner.dashboard.view',
-            'owner.statistics.view',
-            'owner.reports.view',
-            'owner.activity.view',
-            'owner.admins.manage',
+            Permission::query()
+                ->where('guard_name', 'web')
+                ->pluck('name')
+                ->all()
         ]);
 
         // Admin
         $admin->syncPermissions([
+            // Dashboard
+            'dashboard.view',
+
+            // Employees
             'employees.view',
             'employees.create',
             'employees.update',
             'employees.status.update',
 
+            // Roles
             'roles.view',
+            'roles.create',
+            'roles.update',
 
+            // Bays
             'bays.view',
             'bays.create',
             'bays.update',
             'bays.status.update',
+
+            // Customers
+            'customers.view',
+            'customers.create',
+            'customers.update',
+            'customers.status.update',
+
+            // Vehicles
+            'vehicles.view',
+            'vehicles.create',
+            'vehicles.update',
+            'vehicles.status.update',
+
+            // Job Cards
+            'job-cards.view',
+            'job-cards.create',
+            'job-cards.update',
+            'job-cards.status.update',
         ]);
 
         // Advisor
-        $advisor->syncPermissions([]);
+        $advisor->syncPermissions([
+            'dashboard.view',
+
+            'customers.view',
+            'customers.create',
+            'customers.update',
+
+            'vehicles.view',
+            'vehicles.create',
+            'vehicles.update',
+
+            'job-cards.view',
+            'job-cards.create',
+            'job-cards.update',
+            'job-cards.status.update',
+
+            'bays.view',
+        ]);
 
         // Floor Manager
-        $floorManager->syncPermissions([]);
+        $floorManager->syncPermissions([
+            'dashboard.view',
+
+            'employees.view',
+
+            'customers.view',
+            'vehicles.view',
+
+            'job-cards.view',
+            'job-cards.create',
+            'job-cards.update',
+            'job-cards.status.update',
+
+            'bays.view',
+            'bays.update',
+
+            'parts.view',
+            'inventory.view',
+        ]);
 
         // Mechanic
-        $mechanic->syncPermissions([]);
+        $mechanic->syncPermissions([
+            'dashboard.view',
+            'job-cards.view',
+            'bays.view',
+            'parts.view',
+        ]);
 
         // AutoPart Store Manager
         $autoPartsStoreManager->syncPermissions([
+            'dashboard.view',
 
             // Auto Parts
             'parts.view',
@@ -170,6 +236,7 @@ class RoleSeeder extends Seeder
         ]);
         // General Store Manager
         $generalStoreManager->syncPermissions([
+            'dashboard.view',
 
             // General Inventory
             'inventory.view',
@@ -181,9 +248,35 @@ class RoleSeeder extends Seeder
         ]);
 
         // Customer Support
-        $customerSupport->syncPermissions([]);
+        $customerSupport->syncPermissions([
+            'dashboard.view',
 
-        $mechanicCoordinator->syncPermissions([]);
+            'customers.view',
+            'customers.create',
+            'customers.update',
+
+            'vehicles.view',
+            'vehicles.create',
+            'vehicles.update',
+
+            'job-cards.view',
+        ]);
+
+        $mechanicCoordinator->syncPermissions([
+            'dashboard.view',
+
+            'employees.view',
+
+            'job-cards.view',
+            'job-cards.create',
+            'job-cards.update',
+            'job-cards.status.update',
+
+            'bays.view',
+            'bays.update',
+
+            'parts.view',
+        ]);
 
         $customer->syncPermissions([
             'customers.view',

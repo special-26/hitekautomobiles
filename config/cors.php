@@ -16,14 +16,15 @@ return [
     */
 
     'paths' => [
-        'api/*', 
-        'sanctum/csrf-cookie'
+        'api/*',
+        'sanctum/csrf-cookie',
+        '/login'
     ],
 
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'http://app.hitek.test:3000'
+        'http://127.0.0.1:3000'
     ],
 
     'allowed_origins_patterns' => [],

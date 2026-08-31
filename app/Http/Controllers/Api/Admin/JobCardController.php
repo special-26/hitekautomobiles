@@ -51,12 +51,6 @@ class JobCardController extends Controller
                 'exists:vehicles,id',
             ],
 
-            'service_booking_id' => [
-                'nullable',
-                'integer',
-                'exists:service_bookings,id',
-            ],
-
             'advisor_id' => [
                 'nullable',
                 'integer',
@@ -179,7 +173,6 @@ class JobCardController extends Controller
         $jobCard->load([
             'customer:id,customer_code,name,phone,email',
             'vehicle:id,customer_id,registration_number,make,model,variant,fuel_type,current_odometer',
-            'serviceBooking:id,service_date,slot_key,service_type,status',
             'advisor:id,employee_code,designation,phone',
             'advisor.user:id,name,email',
             'bay:id,name,code,type',
@@ -205,12 +198,6 @@ class JobCardController extends Controller
                 'required',
                 'integer',
                 'exists:vehicles,id',
-            ],
-
-            'service_booking_id' => [
-                'nullable',
-                'integer',
-                'exists:service_bookings,id',
             ],
 
             'advisor_id' => [

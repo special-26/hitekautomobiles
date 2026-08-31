@@ -6,22 +6,20 @@ use App\Http\Controllers\Api\Admin\CustomerController;
 use App\Http\Controllers\Api\Admin\DepartmentController;
 use App\Http\Controllers\Api\Admin\EmployeeController;
 use App\Http\Controllers\Api\Admin\JobCardController;
+use App\Http\Controllers\Api\Admin\PermissionController;
 use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\VehicleController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CustomerAuthController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('web')->group(function () {
+Route::post('/login', [AuthController::class, 'login']);
 
-    Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', [AuthController::class, 'user']);
 
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/user', [AuthController::class, 'user']);
-
-        Route::post('/logout', [AuthController::class, 'logout'])
-            ->name('logout');
-    });
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
 
 /*
@@ -135,23 +133,6 @@ Route::middleware('auth:sanctum')
 
         /*
     |--------------------------------------------------------------------------
-    | Role Management
-    |--------------------------------------------------------------------------
-    */
-        Route::middleware('permission:roles.view')->group(function () {
-            Route::get(
-                '/roles',
-                [RoleController::class, 'index']
-            );
-
-            Route::get(
-                '/roles/{role}',
-                [RoleController::class, 'show']
-            );
-        });
-
-        /*
-    |--------------------------------------------------------------------------
     | Bays
     |--------------------------------------------------------------------------
     */
@@ -239,18 +220,71 @@ Route::middleware('auth:sanctum')
             '/vehicles/{vehicle}/status',
             [VehicleController::class, 'updateStatus']
         )->middleware('permission:vehicles.status.update');
+
+        /*
+    ----------------------------------------------------------------------
+    | JobCard Routes - for admin, advisor, manager
+    |----------------------------------------------------------------------
+    */
+        Route::get(
+            '/job-cards',
+            [JobCardController::class, 'index']
+        )->middleware('permission:job-cards.view');
+        Route::post(
+            '/job-cards',
+            [JobCardController::class, 'store']
+        )->middleware('permission:job-cards.create');
+        Route::get(
+            '/job-cards/{jobCard}',
+            [JobCardController::class, 'show']
+        )->middleware('permission:job-cards.view');
+        Route::put(
+            '/job-cards/{jobCard}',
+            [JobCardController::class, 'update']
+        )->middleware('permission:job-cards.update');
+        Route::patch(
+            '/job-cards/{jobCard}/status',
+            [JobCardController::class, 'updateStatus']
+        )->middleware('permission:job-cards.status.update');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Permission Management
+    |--------------------------------------------------------------------------
+    */
+        Route::get(
+            '/permissions',
+            [PermissionController::class, 'index']
+        )->middleware('permission:roles.view');
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Role Management
+    |--------------------------------------------------------------------------
+    */
+        Route::middleware('permission:roles.view')->group(function () {
+            Route::get(
+                '/roles',
+                [RoleController::class, 'index']
+            );
+
+            Route::get(
+                '/roles/{role}',
+                [RoleController::class, 'show']
+            );
+        });
+        Route::post(
+            '/roles',
+            [RoleController::class, 'store']
+        )->middleware('permission:roles.create');
+
+        Route::put(
+            '/roles/{role}',
+            [RoleController::class, 'update']
+        )->middleware('permission:roles.update');
     });
 
-/*
-|--------------------------------------------------------------------------
-| JobCard Routes - for admin, advisor, manager
-|--------------------------------------------------------------------------
-*/
-Route::get('/job-cards', [JobCardController::class, 'index']);
-Route::post('/job-cards', [JobCardController::class, 'store']);
-Route::get('/job-cards/{jobCard}', [JobCardController::class, 'show']);
-Route::put('/job-cards/{jobCard}', [JobCardController::class, 'update']);
-Route::patch('/job-cards/{jobCard}/status', [JobCardController::class, 'updateStatus']);
 
 
 /*

@@ -23,6 +23,7 @@ class PermissionSeeder extends Seeder
             'owner.admins.manage',
 
             // Dashboard
+            'dashboard.view',
 
             // Users
 
@@ -44,7 +45,6 @@ class PermissionSeeder extends Seeder
             'job-cards.create',
             'job-cards.update',
             'job-cards.status.update',
-            'job-cards.assign',
 
             // Bays
             'bays.view',
@@ -92,6 +92,8 @@ class PermissionSeeder extends Seeder
 
             // Role Management
             'roles.view',
+            'roles.create',
+            'roles.update',
 
         ];
 
