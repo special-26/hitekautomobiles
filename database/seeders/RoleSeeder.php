@@ -170,6 +170,12 @@ class RoleSeeder extends Seeder
             'job-cards.create',
             'job-cards.update',
             'job-cards.status.update',
+
+            // Job Card Task Permissions
+            'job-card-tasks.view',
+            'job-card-tasks.create',
+            'job-card-tasks.update',
+            'job-card-tasks.status.update',
         ]);
 
         // Advisor
@@ -188,6 +194,12 @@ class RoleSeeder extends Seeder
             'job-cards.create',
             'job-cards.update',
             'job-cards.status.update',
+
+            // Job Card Task Permissions
+            'job-card-tasks.view',
+            'job-card-tasks.create',
+            'job-card-tasks.update',
+            'job-card-tasks.status.update',
 
             'bays.view',
         ]);

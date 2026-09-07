@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\Admin\CustomerController;
 use App\Http\Controllers\Api\Admin\DepartmentController;
 use App\Http\Controllers\Api\Admin\EmployeeController;
 use App\Http\Controllers\Api\Admin\JobCardController;
+use App\Http\Controllers\Api\Admin\JobCardTaskController;
+use App\Http\Controllers\Api\Admin\MechanicTaskController;
 use App\Http\Controllers\Api\Admin\PermissionController;
 use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\VehicleController;
@@ -246,7 +248,38 @@ Route::middleware('auth:sanctum')
             '/job-cards/{jobCard}/status',
             [JobCardController::class, 'updateStatus']
         )->middleware('permission:job-cards.status.update');
+        Route::patch(
+            '/job-cards/{jobCard}/workflow-status',
+            [JobCardController::class, 'updateWorkflowStatus']
+        )->middleware('permission:job-cards.status.update');
 
+        // Job Card Task Routes
+        Route::prefix('job-cards/{jobCard}/tasks')->group(function () {
+            Route::get(
+                '/',
+                [JobCardTaskController::class, 'index']
+            )->middleware('permission:job-card-tasks.view');
+
+            Route::post(
+                '/',
+                [JobCardTaskController::class, 'store']
+            )->middleware('permission:job-card-tasks.create');
+
+            Route::get(
+                '/{task}',
+                [JobCardTaskController::class, 'show']
+            )->middleware('permission:job-card-tasks.view');
+
+            Route::put(
+                '/{task}',
+                [JobCardTaskController::class, 'update']
+            )->middleware('permission:job-card-tasks.update');
+
+            Route::patch(
+                '/{task}/status',
+                [JobCardTaskController::class, 'updateStatus']
+            )->middleware('permission:job-card-tasks.status.update');
+        });
         /*
     |--------------------------------------------------------------------------
     | Permission Management
@@ -283,6 +316,21 @@ Route::middleware('auth:sanctum')
             '/roles/{role}',
             [RoleController::class, 'update']
         )->middleware('permission:roles.update');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Role Management
+    |--------------------------------------------------------------------------
+    */
+        Route::prefix('mechanic/tasks')
+            ->group(function () {
+                Route::get('/', [MechanicTaskController::class, 'index']);
+                Route::get('/{task}', [MechanicTaskController::class, 'show']);
+                Route::patch('/{task}/status', [
+                    MechanicTaskController::class,
+                    'updateStatus'
+                ]);
+            });
     });
 
 

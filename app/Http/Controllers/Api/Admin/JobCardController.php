@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Bay;
 use App\Models\Employee;
@@ -19,21 +20,17 @@ class JobCardController extends Controller
         $jobCards = JobCard::query()
             ->with([
                 'customer:id,customer_code,name,phone',
-                'vehicle:id,customer_id,registration_number,make,model',
-                'advisor:id,employee_code,designation',
-                'advisor.user:id,name',
+                'vehicle:id,customer_id,registration_number,make,model,variant',
+                'department:id,name',
                 'bay:id,name,code',
+                'advisor:id,user_id',
             ])
-            ->when($request->status, function ($query, $status) {
-                $query->where('status', $status);
-            })
-            ->when($request->priority, function ($query, $priority) {
-                $query->where('priority', $priority);
-            })
-            ->latest()
-            ->paginate(20);
-
-        return response()->json($jobCards);
+            ->orderByDesc('id')
+            ->get();
+        return ApiResponse::success(
+            $jobCards,
+            'Job cards fetched successfully.'
+        );
     }
 
     public function store(Request $request): JsonResponse
@@ -50,283 +47,280 @@ class JobCardController extends Controller
                 'integer',
                 'exists:vehicles,id',
             ],
-
-            'advisor_id' => [
-                'nullable',
-                'integer',
-                'exists:employees,id',
-            ],
-
-            'bay_id' => [
-                'nullable',
-                'integer',
-                'exists:bays,id',
-            ],
-
-            'complaint' => [
-                'nullable',
-                'string',
-            ],
-
-            'work_description' => [
-                'nullable',
-                'string',
-            ],
-
-            'estimated_cost' => [
-                'nullable',
-                'numeric',
-                'min:0',
-            ],
-
-            'estimated_completion_at' => [
-                'nullable',
-                'date',
-            ],
-
-            'priority' => [
-                'nullable',
-                'string',
-                Rule::in([
-                    'low',
-                    'normal',
-                    'high',
-                    'urgent',
-                ]),
-            ],
+            'department_id' => ['required', 'integer', 'exists:departments,id',],
+            'bay_id' => ['nullable', 'integer', 'exists:bays,id',],
+            'advisor_id' => ['nullable', 'integer', 'exists:employees,id',],
+            'complaint' => ['required', 'string',],
+            'customer_notes' => ['nullable', 'string',],
+            'estimated_cost' => ['nullable', 'numeric', 'min:0',],
+            'estimated_completion_at' => ['nullable', 'date',],
         ]);
 
-        $vehicleBelongsToCustomer = Vehicle::query()
+        /* 
+        |-------------------------------------------------------------------------- 
+        | Validate Vehicle Belongs To Customer |-------------------------------------------------------------------------- 
+        */
+        $vehicleBelongsToCustomer = DB::table('vehicles')
             ->where('id', $validated['vehicle_id'])
             ->where('customer_id', $validated['customer_id'])
             ->exists();
 
         if (! $vehicleBelongsToCustomer) {
-            return response()->json([
-                'message' => 'The selected vehicle does not belong to the selected customer.',
-            ], 422);
-        }
-
-        if (! empty($validated['advisor_id'])) {
-            $advisorExists = Employee::query()
-                ->where('id', $validated['advisor_id'])
-                ->where('status', 'active')
-                ->exists();
-
-            if (! $advisorExists) {
-                return response()->json([
-                    'message' => 'The selected advisor is not active.',
-                ], 422);
-            }
-        }
-
-        if (! empty($validated['bay_id'])) {
-            $bayExists = Bay::query()
-                ->where('id', $validated['bay_id'])
-                ->where('is_active', true)
-                ->exists();
-
-            if (! $bayExists) {
-                return response()->json([
-                    'message' => 'The selected bay is not active.',
-                ], 422);
-            }
-        }
-
-        $jobCard = DB::transaction(function () use ($validated) {
-
-            $lastId = JobCard::query()
-                ->lockForUpdate()
-                ->max('id');
-
-            $jobCardNumber = 'JC-' . str_pad(
-                (string) (($lastId ?? 0) + 1),
-                6,
-                '0',
-                STR_PAD_LEFT
+            return ApiResponse::error(
+                'The selected vehicle does not belong to the selected customer.',
+                422
             );
+        }
 
-            return JobCard::create([
-                ...$validated,
-                'job_card_number' => $jobCardNumber,
-                'status' => 'open',
-                'priority' => $validated['priority'] ?? 'normal',
-            ]);
+        /* 
+        |-------------------------------------------------------------------------- 
+        | Validate Bay Belongs To Department |-------------------------------------------------------------------------- 
+        */
+        if (! empty($validated['bay_id'])) {
+            $bayBelongsToDepartment = DB::table('bays')
+                ->where('id', $validated['bay_id'])
+                ->where(
+                    'department_id',
+                    $validated['department_id']
+                )
+                ->exists();
+
+            if (! $bayBelongsToDepartment) {
+                return ApiResponse::error(
+                    'The selected bay does not belong to the selected department.',
+                    422
+                );
+            }
+        }
+
+        /* 
+        |-------------------------------------------------------------------------- 
+        | Create Job Card 
+        |-------------------------------------------------------------------------- 
+        */
+        $jobCard = DB::transaction(function () use ($validated) {
+            $lastJobCard = JobCard::query()
+                ->orderByDesc('id')
+                ->lockForUpdate()
+                ->first();
+
+            $nextNumber = $lastJobCard
+                ? $lastJobCard->id + 1
+                : 1;
+
+            $validated['job_card_number'] =
+                'JC-' . str_pad(
+                    $nextNumber,
+                    6,
+                    '0',
+                    STR_PAD_LEFT
+                );
+
+            $validated['status'] = 'pending';
+            $validated['is_active'] = true;
+
+            return JobCard::create($validated);
         });
 
-        $jobCard->load([
-            'customer:id,customer_code,name,phone',
-            'vehicle:id,customer_id,registration_number,make,model',
-            'advisor:id,employee_code,designation',
-            'advisor.user:id,name',
-            'bay:id,name,code',
-        ]);
-
-        return response()->json([
-            'message' => 'Job card created successfully.',
-            'data' => $jobCard,
-        ], 201);
+        return ApiResponse::success(
+            $jobCard->load([
+                'customer:id,customer_code,name,phone',
+                'vehicle:id,customer_id,registration_number,make,model,variant',
+                'department:id,name',
+                'bay:id,name,code',
+                'advisor:id,user_id',
+            ]),
+            'Job card created successfully.',
+            201
+        );
     }
 
+    /** * Show job card */
     public function show(JobCard $jobCard): JsonResponse
     {
         $jobCard->load([
-            'customer:id,customer_code,name,phone,email',
-            'vehicle:id,customer_id,registration_number,make,model,variant,fuel_type,current_odometer',
-            'advisor:id,employee_code,designation,phone',
-            'advisor.user:id,name,email',
-            'bay:id,name,code,type',
+            'customer',
+            'vehicle',
+            'department',
+            'bay',
+            'advisor:id,user_id',
         ]);
 
-        return response()->json([
-            'data' => $jobCard,
-        ]);
+        return ApiResponse::success(
+            $jobCard,
+            'Job card fetched successfully.'
+        );
     }
 
+    /** * Update job card */
     public function update(Request $request, JobCard $jobCard): JsonResponse
     {
         $validated = $request->validate([
-            'customer_id' => [
-                'sometimes',
-                'required',
-                'integer',
-                'exists:customers,id',
-            ],
+            'customer_id' => ['required', 'integer', 'exists:customers,id',],
 
-            'vehicle_id' => [
-                'sometimes',
-                'required',
-                'integer',
-                'exists:vehicles,id',
-            ],
+            'vehicle_id' => ['required', 'integer', 'exists:vehicles,id',],
 
-            'advisor_id' => [
-                'nullable',
-                'integer',
-                'exists:employees,id',
-            ],
+            'department_id' => ['required', 'integer', 'exists:departments,id',],
 
-            'bay_id' => [
-                'nullable',
-                'integer',
-                'exists:bays,id',
-            ],
+            'bay_id' => ['nullable', 'integer', 'exists:bays,id',],
 
-            'complaint' => [
-                'nullable',
-                'string',
-            ],
+            'advisor_id' => ['nullable', 'integer', 'exists:employees,id',],
 
-            'work_description' => [
-                'nullable',
-                'string',
-            ],
+            'complaint' => ['required', 'string',],
 
-            'estimated_cost' => [
-                'nullable',
-                'numeric',
-                'min:0',
-            ],
+            'customer_notes' => ['nullable', 'string',],
 
-            'estimated_completion_at' => [
-                'nullable',
-                'date',
-            ],
+            'estimated_cost' => ['nullable', 'numeric', 'min:0',],
 
-            'priority' => [
-                'sometimes',
-                'string',
-                Rule::in([
-                    'low',
-                    'normal',
-                    'high',
-                    'urgent',
-                ]),
-            ],
+            'estimated_completion_at' => ['nullable', 'date',],
         ]);
 
-        $customerId = $validated['customer_id'] ?? $jobCard->customer_id;
-        $vehicleId = $validated['vehicle_id'] ?? $jobCard->vehicle_id;
-
-        $vehicleBelongsToCustomer = Vehicle::query()
-            ->where('id', $vehicleId)
-            ->where('customer_id', $customerId)
+        /* 
+        |-------------------------------------------------------------------------- 
+        | Validate Vehicle Belongs To Customer |-------------------------------------------------------------------------- 
+        */
+        $vehicleBelongsToCustomer = DB::table('vehicles')
+            ->where('id', $validated['vehicle_id'])
+            ->where('customer_id', $validated['customer_id'])
             ->exists();
 
         if (! $vehicleBelongsToCustomer) {
-            return response()->json([
-                'message' => 'The selected vehicle does not belong to the selected customer.',
-            ], 422);
+            return ApiResponse::error(
+                'The selected vehicle does not belong to the selected customer.',
+                422
+            );
         }
 
-        if (array_key_exists('advisor_id', $validated) && $validated['advisor_id']) {
-            $advisorExists = Employee::query()
-                ->where('id', $validated['advisor_id'])
-                ->where('status', 'active')
-                ->exists();
-
-            if (! $advisorExists) {
-                return response()->json([
-                    'message' => 'The selected advisor is not active.',
-                ], 422);
-            }
-        }
-
-        if (array_key_exists('bay_id', $validated) && $validated['bay_id']) {
-            $bayExists = Bay::query()
+        /* 
+        |-------------------------------------------------------------------------- 
+        | Validate Bay Belongs To Department |-------------------------------------------------------------------------- 
+        */
+        if (! empty($validated['bay_id'])) {
+            $bayBelongsToDepartment = DB::table('bays')
                 ->where('id', $validated['bay_id'])
-                ->where('is_active', true)
+                ->where(
+                    'department_id',
+                    $validated['department_id']
+                )
                 ->exists();
 
-            if (! $bayExists) {
-                return response()->json([
-                    'message' => 'The selected bay is not active.',
-                ], 422);
+            if (! $bayBelongsToDepartment) {
+                return ApiResponse::error(
+                    'The selected bay does not belong to the selected department.',
+                    422
+                );
             }
         }
 
         $jobCard->update($validated);
 
-        $jobCard->load([
-            'customer:id,customer_code,name,phone',
-            'vehicle:id,customer_id,registration_number,make,model',
-            'advisor:id,employee_code,designation',
-            'advisor.user:id,name',
-            'bay:id,name,code',
-        ]);
-
-        return response()->json([
-            'message' => 'Job card updated successfully.',
-            'data' => $jobCard,
-        ]);
+        return ApiResponse::success(
+            $jobCard->fresh()->load([
+                'customer:id,customer_code,name,phone',
+                'vehicle:id,customer_id,registration_number,make,model,variant',
+                'department:id,name',
+                'bay:id,name,code',
+                'advisor:id,user_id',
+            ]),
+            'Job card updated successfully.'
+        );
     }
 
+    /** * Activate / deactivate job card */
     public function updateStatus(
         Request $request,
         JobCard $jobCard
     ): JsonResponse {
         $validated = $request->validate([
-            'status' => [
+            'is_active' => [
                 'required',
-                'string',
-                Rule::in([
-                    'open',
-                    'in_progress',
-                    'waiting_parts',
-                    'completed',
-                    'cancelled',
-                    'delivered',
-                ]),
+                'boolean',
             ],
         ]);
 
         $jobCard->update([
-            'status' => $validated['status'],
+            'is_active' => $validated['is_active'],
         ]);
 
-        return response()->json([
-            'message' => 'Job card status updated successfully.',
-            'data' => $jobCard->fresh(),
+        return ApiResponse::success(
+            $jobCard->fresh(),
+            'Job card status updated successfully.'
+        );
+    }
+
+    /** * Update workflow status */
+
+    public function updateWorkflowStatus(
+        Request $request,
+        JobCard $jobCard
+    ) {
+        $validated = $request->validate([
+            'status' => [
+                'required',
+                Rule::in([
+                    'pending',
+                    'confirmed',
+                    'in_progress',
+                    'on_hold',
+                    'completed',
+                    'cancelled',
+                ]),
+            ],
         ]);
+
+        $newStatus = $validated['status'];
+        $currentStatus = $jobCard->status;
+
+        $allowedTransitions = [
+            'pending' => [
+                'confirmed',
+                'cancelled',
+            ],
+
+            'confirmed' => [
+                'pending',
+                'in_progress',
+                'cancelled',
+            ],
+
+            'in_progress' => [
+                'confirmed',
+                'on_hold',
+                'completed',
+            ],
+
+            'on_hold' => [
+                'in_progress',
+                'completed',
+                'cancelled'
+            ],
+
+            'completed' => [],
+
+            'cancelled' => [],
+        ];
+
+        if (
+            $newStatus !== $currentStatus &&
+            ! in_array(
+                $newStatus,
+                $allowedTransitions[$currentStatus] ?? [],
+                true
+            )
+        ) {
+            return ApiResponse::error(
+                "Job card cannot be changed from {$currentStatus} to {$newStatus}.",
+                422
+            );
+        }
+
+        $jobCard->update([
+            'status' => $newStatus,
+        ]);
+
+        return ApiResponse::success(
+            $jobCard->fresh(),
+            'Job card workflow status updated successfully.'
+        );
     }
 }

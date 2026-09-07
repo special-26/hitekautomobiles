@@ -5,10 +5,12 @@ namespace App\Models;
 use App\Models\Bay;
 use App\Models\Customer;
 use App\Models\Employee;
+use App\Models\JobCardTask;
 use App\Models\ServiceBooking;
 use App\Models\Vehicle;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class JobCard extends Model
 {
@@ -84,10 +86,12 @@ class JobCard extends Model
     |
     */
 
-    // public function tasks(): HasMany
-    // {
-    //     return $this->hasMany(JobCardTask::class);
-    // }
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(
+            JobCardTask::class
+        );
+    }
 
     // public function assignments(): HasMany
     // {

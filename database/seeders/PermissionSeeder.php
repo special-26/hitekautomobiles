@@ -46,6 +46,12 @@ class PermissionSeeder extends Seeder
             'job-cards.update',
             'job-cards.status.update',
 
+            // Job Card Tasks
+            'job-card-tasks.view',
+            'job-card-tasks.create',
+            'job-card-tasks.update',
+            'job-card-tasks.status.update',
+
             // Bays
             'bays.view',
             'bays.create',
