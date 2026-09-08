@@ -171,11 +171,17 @@ class RoleSeeder extends Seeder
             'job-cards.update',
             'job-cards.status.update',
 
+            // Parts
+            'parts.view',
+            'parts.create',
+            'parts.update',
+            'parts.status.update',
+
             // Job Card Task Permissions
-            'job-card-tasks.view',
-            'job-card-tasks.create',
-            'job-card-tasks.update',
-            'job-card-tasks.status.update',
+            'job-cards-tasks.view',
+            'job-cards-tasks.create',
+            'job-cards-tasks.update',
+            'job-cards-tasks.status.update',
         ]);
 
         // Advisor
@@ -196,10 +202,10 @@ class RoleSeeder extends Seeder
             'job-cards.status.update',
 
             // Job Card Task Permissions
-            'job-card-tasks.view',
-            'job-card-tasks.create',
-            'job-card-tasks.update',
-            'job-card-tasks.status.update',
+            'job-cards-tasks.view',
+            'job-cards-tasks.create',
+            'job-cards-tasks.update',
+            'job-cards-tasks.status.update',
 
             'bays.view',
         ]);
@@ -228,7 +234,10 @@ class RoleSeeder extends Seeder
         // Mechanic
         $mechanic->syncPermissions([
             'dashboard.view',
+
             'job-cards.view',
+            'job-cards-tasks.view',
+
             'bays.view',
             'parts.view',
         ]);
@@ -283,6 +292,12 @@ class RoleSeeder extends Seeder
             'job-cards.create',
             'job-cards.update',
             'job-cards.status.update',
+
+            // Job Card Task Permissions
+            'job-cards-tasks.view',
+            'job-cards-tasks.create',
+            'job-cards-tasks.update',
+            'job-cards-tasks.status.update',
 
             'bays.view',
             'bays.update',

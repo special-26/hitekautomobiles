@@ -6,14 +6,17 @@ use App\Http\Controllers\Api\Admin\CustomerController;
 use App\Http\Controllers\Api\Admin\DepartmentController;
 use App\Http\Controllers\Api\Admin\EmployeeController;
 use App\Http\Controllers\Api\Admin\JobCardController;
+use App\Http\Controllers\Api\Admin\JobCardPartController;
 use App\Http\Controllers\Api\Admin\JobCardTaskController;
+use App\Http\Controllers\Api\Admin\MechanicCoordinatorTaskController;
 use App\Http\Controllers\Api\Admin\MechanicTaskController;
+use App\Http\Controllers\Api\Admin\PartController;
 use App\Http\Controllers\Api\Admin\PermissionController;
 use App\Http\Controllers\Api\Admin\RoleController;
+use App\Http\Controllers\Api\Admin\StockMovementController;
 use App\Http\Controllers\Api\Admin\VehicleController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CustomerAuthController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -258,27 +261,27 @@ Route::middleware('auth:sanctum')
             Route::get(
                 '/',
                 [JobCardTaskController::class, 'index']
-            )->middleware('permission:job-card-tasks.view');
+            )->middleware('permission:job-cards-tasks.view');
 
             Route::post(
                 '/',
                 [JobCardTaskController::class, 'store']
-            )->middleware('permission:job-card-tasks.create');
+            )->middleware('permission:job-cards-tasks.create');
 
             Route::get(
                 '/{task}',
                 [JobCardTaskController::class, 'show']
-            )->middleware('permission:job-card-tasks.view');
+            )->middleware('permission:job-cards-tasks.view');
 
             Route::put(
                 '/{task}',
                 [JobCardTaskController::class, 'update']
-            )->middleware('permission:job-card-tasks.update');
+            )->middleware('permission:job-cards-tasks.update');
 
             Route::patch(
                 '/{task}/status',
                 [JobCardTaskController::class, 'updateStatus']
-            )->middleware('permission:job-card-tasks.status.update');
+            )->middleware('permission:job-cards-tasks.status.update');
         });
         /*
     |--------------------------------------------------------------------------
@@ -330,6 +333,67 @@ Route::middleware('auth:sanctum')
                     MechanicTaskController::class,
                     'updateStatus'
                 ]);
+            });
+
+        /*
+    |--------------------------------------------------------------------------
+    | Mechanic Cordinator Task Management
+    |--------------------------------------------------------------------------
+    */
+        Route::prefix('coordinator/tasks')
+            ->middleware(['permission:job-cards-tasks.view'])
+            ->group(function () {
+                Route::get('/', [
+                    MechanicCoordinatorTaskController::class,
+                    'index',
+                ]);
+
+                Route::get('/{task}', [
+                    MechanicCoordinatorTaskController::class,
+                    'show',
+                ]);
+
+                Route::patch('/{task}/status', [
+                    MechanicCoordinatorTaskController::class,
+                    'updateStatus',
+                ])->middleware('permission:job-cards-tasks.status.update');
+
+                Route::patch('/{task}/assignment', [
+                    MechanicCoordinatorTaskController::class,
+                    'updateAssignment',
+                ])->middleware('permission:job-cards-tasks.update');
+            });
+
+        /*
+    |--------------------------------------------------------------------------
+    | Car Parts Management
+    |--------------------------------------------------------------------------
+    */
+        Route::prefix('/parts')
+            ->group(function () {
+                Route::get('/', [PartController::class, 'index']);
+                Route::post('/', [PartController::class, 'store']);
+                Route::get('/{part}', [PartController::class, 'show']);
+                Route::put('/{part}', [PartController::class, 'update']);
+                Route::delete('/{part}', [PartController::class, 'destroy']);
+            });
+
+        Route::prefix('/stock-movements')
+            ->group(function () {
+                Route::get('/', [StockMovementController::class, 'index']);
+                Route::post('/', [StockMovementController::class, 'store']);
+                Route::get('/{stockMovement}', [StockMovementController::class, 'show']);
+            });
+
+        Route::prefix('/job-cards/{jobCard}/parts')
+            ->group(function () {
+                Route::get('/', [JobCardPartController::class, 'index']);
+                Route::post('/', [JobCardPartController::class, 'store']);
+                Route::get('/{jobCardPart}', [JobCardPartController::class, 'show']);
+                Route::put('/{jobCardPart}', [JobCardPartController::class, 'update']);
+                Route::delete('/{jobCardPart}', [JobCardPartController::class, 'destroy']);
+                Route::patch('/{jobCardPart}/issue', [JobCardPartController::class, 'issue']);
+                Route::patch('/{jobCardPart}/return', [JobCardPartController::class, 'returnPart']);
             });
     });
 

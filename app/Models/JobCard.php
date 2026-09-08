@@ -98,10 +98,10 @@ class JobCard extends Model
     //     return $this->hasMany(JobCardAssignment::class);
     // }
 
-    // public function parts(): HasMany
-    // {
-    //     return $this->hasMany(JobCardPart::class);
-    // }
+    public function parts(): HasMany
+    {
+        return $this->hasMany(JobCardPart::class);
+    }
 
     // public function photos(): HasMany
     // {

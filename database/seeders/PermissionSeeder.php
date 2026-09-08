@@ -47,10 +47,10 @@ class PermissionSeeder extends Seeder
             'job-cards.status.update',
 
             // Job Card Tasks
-            'job-card-tasks.view',
-            'job-card-tasks.create',
-            'job-card-tasks.update',
-            'job-card-tasks.status.update',
+            'job-cards-tasks.view',
+            'job-cards-tasks.create',
+            'job-cards-tasks.update',
+            'job-cards-tasks.status.update',
 
             // Bays
             'bays.view',
@@ -66,6 +66,9 @@ class PermissionSeeder extends Seeder
 
             // Auto Parts Inventory
             'parts.view',
+            'parts.create',
+            'parts.update',
+            'parts.status.update',
             'parts.manage',
             'parts.receive',
             'parts.issue',
