@@ -142,6 +142,12 @@ class RoleSeeder extends Seeder
             'employees.update',
             'employees.status.update',
 
+            // Department
+            'departments.view',
+            'departments.create',
+            'departments.update',
+            'departments.status.update',
+
             // Roles
             'roles.view',
             'roles.create',
@@ -192,6 +198,11 @@ class RoleSeeder extends Seeder
             'customers.create',
             'customers.update',
 
+            // Employees
+            'employees.view',
+
+            'departments.view',
+
             'vehicles.view',
             'vehicles.create',
             'vehicles.update',
@@ -200,6 +211,12 @@ class RoleSeeder extends Seeder
             'job-cards.create',
             'job-cards.update',
             'job-cards.status.update',
+
+            // Parts
+            'parts.view',
+            'parts.create',
+            'parts.update',
+            'parts.status.update',
 
             // Job Card Task Permissions
             'job-cards-tasks.view',
@@ -288,6 +305,8 @@ class RoleSeeder extends Seeder
 
             'employees.view',
 
+            'departments.view',
+
             'job-cards.view',
             'job-cards.create',
             'job-cards.update',
@@ -301,6 +320,12 @@ class RoleSeeder extends Seeder
 
             'bays.view',
             'bays.update',
+
+            // Employees
+            'employees.view',
+            'employees.create',
+            'employees.update',
+            'employees.status.update',
 
             'parts.view',
         ]);

@@ -13,10 +13,20 @@ class BayController extends Controller
     /**
      * List all bays
      */
-    public function index()
+    public function index(Request $request)
     {
         $bays = Bay::query()
             ->with('department:id,name')
+            ->when(
+                $request->filled('department_id'),
+                fn($query) =>
+                $query->where('department_id', $request->department_id)
+            )
+            ->when(
+                $request->has('is_active'),
+                fn($query) =>
+                $query->where('is_active', $request->boolean('is_active'))
+            )
             ->orderBy('name')
             ->get();
 
@@ -32,30 +42,11 @@ class BayController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-            ],
-
-            'code' => [
-                'required',
-                'string',
-                'max:50',
-                'unique:bays,code',
-            ],
-
-            'department_id' => [
-                'required',
-                'integer',
-                'exists:departments,id',
-            ],
-
-            'type' => [
-                'required',
-                'string',
-                'max:100',
-            ],
+            'name' => ['required', 'string', 'max:100',],
+            'code' => ['required', 'string', 'max:50', 'unique:bays,code',],
+            'department_id' => ['required', 'integer', 'exists:departments,id',],
+            'type' => ['required', 'string', 'max:100',],
+            'is_active' => ['sometimes', 'boolean'],
         ]);
 
         $bay = Bay::create([
@@ -79,7 +70,10 @@ class BayController extends Controller
     public function show(Bay $bay)
     {
         return ApiResponse::success(
-            $bay->load('department:id,name'),
+            $bay->load([
+                'department:id,name',
+                'tasks:id,job_card_id,department_id,bay_id,assigned_to,title,status,estimated_minutes',
+            ]),
             'Bay fetched successfully.'
         );
     }
@@ -92,31 +86,16 @@ class BayController extends Controller
         Bay $bay
     ) {
         $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-            ],
-
+            'name' => ['required', 'string', 'max:100',],
             'code' => [
                 'required',
                 'string',
                 'max:50',
-                Rule::unique('bays', 'code')
-                    ->ignore($bay->id),
+                Rule::unique('bays', 'code')->ignore($bay->id),
             ],
-
-            'department_id' => [
-                'required',
-                'integer',
-                'exists:departments,id',
-            ],
-
-            'type' => [
-                'required',
-                'string',
-                'max:100',
-            ],
+            'department_id' => ['required', 'integer', 'exists:departments,id',],
+            'type' => ['required', 'string', 'max:100',],
+            'is_active' => ['sometimes', 'boolean'],
         ]);
 
         $bay->update([

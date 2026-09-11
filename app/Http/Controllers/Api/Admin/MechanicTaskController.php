@@ -26,6 +26,9 @@ class MechanicTaskController extends Controller
                 'jobCard.vehicle:id,customer_id,registration_number,make,model,variant',
                 'department:id,name',
                 'bay:id,name,code,type',
+
+                'parts:id,job_card_task_id,part_id,quantity,status',
+                'parts.part:id,part_number,name,category,brand,unit',
             ])
             ->orderByRaw("
                 CASE status
@@ -62,6 +65,8 @@ class MechanicTaskController extends Controller
             'jobCard.vehicle:id,customer_id,registration_number,make,model,variant,fuel_type,current_odometer',
             'department:id,name',
             'bay:id,name,code,type',
+            'parts:id,job_card_task_id,part_id,quantity,unit_price,discount,total,status,notes',
+            'parts.part:id,part_number,name,category,brand,unit',
         ]);
 
         return ApiResponse::success(

@@ -6,6 +6,7 @@ use App\Models\Bay;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\JobCard;
+use App\Models\JobCardPart;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -62,5 +63,9 @@ class JobCardTask extends Model
             Employee::class,
             'assigned_to'
         );
+    }
+    public function parts()
+    {
+        return $this->hasMany(JobCardPart::class, 'job_card_task_id');
     }
 }

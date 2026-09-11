@@ -20,6 +20,7 @@ class EmployeeController extends Controller
         $employees = Employee::query()
             ->with([
                 'user:id,name,email,is_active',
+                'user.roles:uuid,name',
                 'department:id,name',
             ])
             ->when($request->filled('search'), function ($query) use ($request) {
@@ -43,6 +44,12 @@ class EmployeeController extends Controller
                     'department_id',
                     $request->department_id
                 )
+            )
+            ->when(
+                $request->filled('role'),
+                fn($query) => $query->whereHas('user', function ($query) use ($request) {
+                    $query->role($request->role);
+                })
             )
             ->when(
                 $request->filled('status'),

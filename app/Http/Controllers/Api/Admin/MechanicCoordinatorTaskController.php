@@ -12,6 +12,24 @@ use Illuminate\Validation\Rule;
 
 class MechanicCoordinatorTaskController extends Controller
 {
+    // Summary of workshop tasks by status.
+    public function summary()
+    {
+        $summary = JobCardTask::query()
+            ->selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        return ApiResponse::success([
+            'pending' => (int) ($summary['pending'] ?? 0),
+            'assigned' => (int) ($summary['assigned'] ?? 0),
+            'in_progress' => (int) ($summary['in_progress'] ?? 0),
+            'on_hold' => (int) ($summary['on_hold'] ?? 0),
+            'completed' => (int) ($summary['completed'] ?? 0),
+            'cancelled' => (int) ($summary['cancelled'] ?? 0),
+        ], 'Workshop task summary fetched successfully.');
+    }
+
     /**
      * List workshop tasks.
      */
@@ -26,15 +44,20 @@ class MechanicCoordinatorTaskController extends Controller
                 'bay:id,name,code,type',
                 'assignedEmployee:id,user_id,employee_code,designation,department_id,status',
                 'assignedEmployee.user:id,name',
+                'parts:id,job_card_task_id,part_id,quantity,status',
+                'parts.part:id,part_number,name,category,brand,unit',
             ])
 
             // Optional filters
             ->when(
                 $request->filled('status'),
-                fn($query) => $query->where(
-                    'status',
-                    $request->status
-                )
+                function ($query) use ($request) {
+                    $statuses = is_array($request->status)
+                        ? $request->status
+                        : explode(',', $request->status);
+
+                    $query->whereIn('status', $statuses);
+                }
             )
 
             ->when(
@@ -86,6 +109,8 @@ class MechanicCoordinatorTaskController extends Controller
             'bay:id,name,code,type',
             'assignedEmployee:id,user_id,employee_code,designation,department_id,status',
             'assignedEmployee.user:id,name',
+            'parts:id,job_card_task_id,part_id,quantity,unit_price,discount,total,status,notes',
+            'parts.part:id,part_number,name,category,brand,unit',
         ]);
 
         return ApiResponse::success(
@@ -204,6 +229,8 @@ class MechanicCoordinatorTaskController extends Controller
                 'bay:id,name,code,type',
                 'assignedEmployee:id,user_id,employee_code,designation,department_id,status',
                 'assignedEmployee.user:id,name',
+                'parts:id,job_card_task_id,part_id,quantity,unit_price,discount,total,status,notes',
+                'parts.part:id,part_number,name,category,brand,unit',
             ]),
             'Task status updated successfully.'
         );

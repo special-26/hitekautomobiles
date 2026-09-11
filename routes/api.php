@@ -106,7 +106,7 @@ Route::middleware('auth:sanctum')
     | Department Management
     |--------------------------------------------------------------------------
     */
-        Route::middleware('permission:employees.view')->group(function () {
+        Route::middleware('permission:departments.view')->group(function () {
             Route::get(
                 '/departments',
                 [DepartmentController::class, 'index']
@@ -117,21 +117,21 @@ Route::middleware('auth:sanctum')
             );
         });
         // Create
-        Route::middleware('permission:employees.create')->group(function () {
+        Route::middleware('permission:departments.create')->group(function () {
             Route::post(
                 '/departments',
                 [DepartmentController::class, 'store']
             );
         });
         // Update Department
-        Route::middleware('permission:employees.update')->group(function () {
+        Route::middleware('permission:departments.update')->group(function () {
             Route::put(
                 '/departments/{department}',
                 [DepartmentController::class, 'update']
             );
         });
         // Update Status
-        Route::middleware('permission:employees.update')->patch(
+        Route::middleware('permission:departments.status.update')->patch(
             '/departments/{department}/status',
             [DepartmentController::class, 'updateStatus']
         );
@@ -141,30 +141,32 @@ Route::middleware('auth:sanctum')
     | Bays
     |--------------------------------------------------------------------------
     */
-        Route::get(
-            '/bays',
-            [BayController::class, 'index']
-        )->middleware('permission:bays.view');
+        Route::prefix('bays')->group(function () {
+            Route::get(
+                '/',
+                [BayController::class, 'index']
+            )->middleware('permission:bays.view');
 
-        Route::post(
-            '/bays',
-            [BayController::class, 'store']
-        )->middleware('permission:bays.create');
+            Route::post(
+                '/',
+                [BayController::class, 'store']
+            )->middleware('permission:bays.create');
 
-        Route::get(
-            '/bays/{bay}',
-            [BayController::class, 'show']
-        )->middleware('permission:bays.view');
+            Route::get(
+                '/{bay}',
+                [BayController::class, 'show']
+            )->middleware('permission:bays.view');
 
-        Route::put(
-            '/bays/{bay}',
-            [BayController::class, 'update']
-        )->middleware('permission:bays.update');
+            Route::put(
+                '/{bay}',
+                [BayController::class, 'update']
+            )->middleware('permission:bays.update');
 
-        Route::patch(
-            '/bays/{bay}/status',
-            [BayController::class, 'updateStatus']
-        )->middleware('permission:bays.status.update');
+            Route::patch(
+                '/{bay}/status',
+                [BayController::class, 'updateStatus']
+            )->middleware('permission:bays.status.update');
+        });
 
         /*
     |--------------------------------------------------------------------------
@@ -346,6 +348,10 @@ Route::middleware('auth:sanctum')
                 Route::get('/', [
                     MechanicCoordinatorTaskController::class,
                     'index',
+                ]);
+                Route::get('/summary', [
+                    MechanicCoordinatorTaskController::class,
+                    'summary',
                 ]);
 
                 Route::get('/{task}', [

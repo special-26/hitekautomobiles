@@ -99,6 +99,12 @@ class PermissionSeeder extends Seeder
             'employees.update',
             'employees.status.update',
 
+            // Department Management
+            'departments.view',
+            'departments.create',
+            'departments.update',
+            'departments.status.update',
+
             // Role Management
             'roles.view',
             'roles.create',

@@ -21,6 +21,7 @@ class JobCardTaskController extends Controller
                 'bay:id,name,code,type',
                 'assignedEmployee:id,user_id,employee_code,designation,department_id,status',
                 'assignedEmployee.user:id,name',
+                'assignedEmployee.user.roles:uuid,name',
             ])
             ->orderBy('id')
             ->get();
@@ -82,6 +83,7 @@ class JobCardTaskController extends Controller
             ! empty($validated['assigned_to'])
         ) {
             $employee = Employee::query()
+                ->with('user')
                 ->whereKey(
                     $validated['assigned_to']
                 )
@@ -93,18 +95,27 @@ class JobCardTaskController extends Controller
                     422
                 );
             }
+
             if ($employee->status !== 'active') {
                 return ApiResponse::error(
                     'Selected employee is not active.',
                     422
                 );
             }
+
             if (
                 $employee->department_id !==
                 (int) $validated['department_id']
             ) {
                 return ApiResponse::error(
                     'Selected employee does not belong to the selected department.',
+                    422
+                );
+            }
+
+            if (! $employee->user || ! $employee->user->hasRole('Mechanic')) {
+                return ApiResponse::error(
+                    'Selected employee must have the Mechanic role.',
                     422
                 );
             }

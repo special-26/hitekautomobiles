@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Department;
 use App\Models\JobCard;
+use App\Models\JobCardTask;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,5 +33,10 @@ class Bay extends Model
     public function jobCards(): HasMany
     {
         return $this->hasMany(JobCard::class);
+    }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(JobCardTask::class);
     }
 }
