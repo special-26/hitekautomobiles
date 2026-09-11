@@ -2,16 +2,62 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\JobCard;
 use App\Models\JobCardPart;
 use App\Models\Part;
 use App\Models\StockMovement;
+use App\Models\StoreManagerActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Notifications\JobCardPartIssuedNotification;
+use App\Models\User;
+use App\Notifications\JobCardPartRequestedNotification;
 
 class JobCardPartController extends Controller
 {
+    public function pendingRequests()
+    {
+        $parts = JobCardPart::query()
+            ->where('status', 'pending')
+            ->with([
+                'jobCard:id,job_card_number,customer_id,vehicle_id',
+                'jobCard.customer:id,name,phone',
+                'jobCard.vehicle:id,registration_number,make,model',
+                'part:id,part_number,name,unit,current_stock',
+                'task:id,title',
+                'activities:id,job_card_part_id,user_id,action,description,created_at',
+            ])
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $parts,
+        ]);
+    }
+
+    public function activityHistory(Request $request)
+    {
+        $activities = StoreManagerActivity::query()
+            ->with([
+                'user:id,name',
+                'jobCardPart:id,job_card_id,part_id,job_card_task_id,quantity,status',
+                'jobCardPart.jobCard:id,job_card_number,customer_id,vehicle_id',
+                'jobCardPart.jobCard.vehicle:id,registration_number,make,model',
+                'jobCardPart.part:id,part_number,name,unit',
+                'jobCardPart.task:id,title',
+            ])
+            ->latest()
+            ->get();
+
+        return ApiResponse::success(
+            $activities,
+            'Store Manager activity history fetched successfully.'
+        );
+    }
+
     public function index(JobCard $jobCard)
     {
         $parts = $jobCard->parts()
@@ -27,6 +73,35 @@ class JobCardPartController extends Controller
             'success' => true,
             'data' => $parts,
         ]);
+    }
+
+    public function markViewed(JobCardPart $jobCardPart)
+    {
+        if ($jobCardPart->status !== 'pending') {
+            return ApiResponse::error(
+                'Only pending part requests can be viewed.',
+                422
+            );
+        }
+
+        $alreadyViewed = StoreManagerActivity::query()
+            ->where('job_card_part_id', $jobCardPart->id)
+            ->where('action', 'viewed')
+            ->exists();
+
+        if (! $alreadyViewed) {
+            StoreManagerActivity::create([
+                'job_card_part_id' => $jobCardPart->id,
+                'user_id' => auth()->id(),
+                'action' => 'viewed',
+                'description' => 'Part request viewed by Store Manager.',
+            ]);
+        }
+
+        return ApiResponse::success(
+            null,
+            'Part request marked as viewed.'
+        );
     }
 
     public function store(Request $request, JobCard $jobCard)
@@ -123,6 +198,39 @@ class JobCardPartController extends Controller
             'status' => 'pending',
             'notes' => $validated['notes'] ?? null,
         ]);
+
+        $jobCardPart->load('task');
+
+        StoreManagerActivity::create([
+            'job_card_part_id' => $jobCardPart->id,
+            'user_id' => auth()->id(),
+            'action' => 'requested',
+            'description' => 'Part requested for task: ' . (
+                $jobCardPart->task?->title ?? 'General'
+            ),
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Notify Auto Parts Store Manager
+        |--------------------------------------------------------------------------
+        */
+
+        $jobCardPart->load([
+            'jobCard:id,job_card_number',
+            'part:id,part_number,name,unit',
+            'task:id,title',
+        ]);
+
+        $storeManagers = User::role(
+            'Auto Parts Store Manager'
+        )->get();
+
+        foreach ($storeManagers as $storeManager) {
+            $storeManager->notify(
+                new JobCardPartRequestedNotification($jobCardPart)
+            );
+        }
 
         return response()->json([
             'success' => true,
@@ -319,8 +427,72 @@ class JobCardPartController extends Controller
                 'issued_at' => now(),
             ]);
 
+            $jobCardPart->load('part');
+
+            StoreManagerActivity::create([
+                'job_card_part_id' => $jobCardPart->id,
+                'user_id' => auth()->id(),
+                'action' => 'issued',
+                'description' => 'Part issued: ' . $jobCardPart->part->name
+                    . ' × ' . $jobCardPart->quantity,
+            ]);
+
             return $movement;
         });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Notify Advisor + Mechanic Coordinator
+        |--------------------------------------------------------------------------
+        */
+
+        $jobCardPart->load([
+            'jobCard:id,job_card_number,advisor_id',
+            'jobCard.advisor:id,user_id',
+            'jobCard.advisor.user:id,name',
+            'part:id,part_number,name,unit',
+            'task:id,title',
+        ]);
+
+        $usersToNotify = collect();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Notify Advisor
+        |--------------------------------------------------------------------------
+        */
+
+        if ($jobCardPart->jobCard->advisor?->user) {
+            $usersToNotify->push(
+                $jobCardPart->jobCard->advisor->user
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Notify Mechanic Coordinators
+        |--------------------------------------------------------------------------
+        */
+
+        $coordinators = User::role(
+            'Mechanic Coordinator'
+        )->get();
+
+        foreach ($coordinators as $coordinator) {
+            $usersToNotify->push($coordinator);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Send Notifications
+        |--------------------------------------------------------------------------
+        */
+
+        foreach ($usersToNotify->unique('id') as $user) {
+            $user->notify(
+                new JobCardPartIssuedNotification($jobCardPart)
+            );
+        }
 
         return response()->json([
             'success' => true,

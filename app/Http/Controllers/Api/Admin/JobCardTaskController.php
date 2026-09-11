@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\JobCard;
 use App\Models\JobCardTask;
+use App\Models\User;
+use App\Notifications\JobCardTaskCreatedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -128,11 +130,24 @@ class JobCardTaskController extends Controller
         );
 
         $task->load([
+            'jobCard:id,job_card_number',
             'department:id,name',
             'bay:id,name,code,type',
             'assignedEmployee:id,user_id,employee_code,designation,department_id,status',
             'assignedEmployee.user:id,name',
         ]);
+
+        $usersToNotify = User::role([
+            'Super Admin',
+            'Admin',
+            'Mechanic Coordinator',
+        ])->get();
+
+        foreach ($usersToNotify as $user) {
+            $user->notify(
+                new JobCardTaskCreatedNotification($task)
+            );
+        }
 
         return ApiResponse::success(
             $task,

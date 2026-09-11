@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Bay;
 use App\Models\Employee;
 use App\Models\JobCardTask;
+use App\Models\User;
+use App\Notifications\TaskAssignedNotification;
+use App\Notifications\TaskCompletedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -220,6 +223,61 @@ class MechanicCoordinatorTaskController extends Controller
 
         $task->update($updateData);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Notify Coordinator + Advisor When Task Is Completed
+        |--------------------------------------------------------------------------
+        */
+
+        if ($newStatus === 'completed') {
+
+            $task->load([
+                'jobCard:id,job_card_number,advisor_id',
+                'jobCard.advisor:id,user_id',
+                'jobCard.advisor.user:id,name',
+            ]);
+
+            $usersToNotify = collect();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Notify Advisor
+            |--------------------------------------------------------------------------
+            */
+
+            if ($task->jobCard->advisor?->user) {
+                $usersToNotify->push(
+                    $task->jobCard->advisor->user
+                );
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Notify Mechanic Coordinators
+            |--------------------------------------------------------------------------
+            */
+
+            $coordinators = User::role(
+                'Mechanic Coordinator'
+            )->get();
+
+            foreach ($coordinators as $coordinator) {
+                $usersToNotify->push($coordinator);
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Send Notifications
+            |--------------------------------------------------------------------------
+            */
+
+            foreach ($usersToNotify->unique('id') as $user) {
+                $user->notify(
+                    new TaskCompletedNotification($task)
+                );
+            }
+        }
+
         return ApiResponse::success(
             $task->fresh()->load([
                 'jobCard:id,job_card_number,customer_id,vehicle_id,complaint',
@@ -328,6 +386,27 @@ class MechanicCoordinatorTaskController extends Controller
             'bay_id' => $validated['bay_id'] ?? null,
             'assigned_to' => $validated['assigned_to'] ?? null,
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Notify Assigned Mechanic
+        |--------------------------------------------------------------------------
+        */
+
+        if (! empty($validated['assigned_to'])) {
+            $employee->load('user');
+
+            if ($employee->user) {
+                $task->load([
+                    'jobCard:id,job_card_number',
+                    'bay:id,name',
+                ]);
+
+                $employee->user->notify(
+                    new TaskAssignedNotification($task)
+                );
+            }
+        }
 
         /*
         |--------------------------------------------------------------------------

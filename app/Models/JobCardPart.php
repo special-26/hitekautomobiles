@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Models\JobCard;
-use App\Models\JobCardPart;
 use App\Models\JobCardTask;
 use App\Models\Part;
+use App\Models\StoreManagerActivity;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class JobCardPart extends Model
 {
@@ -59,5 +60,10 @@ class JobCardPart extends Model
     public function issuedBy()
     {
         return $this->belongsTo(User::class, 'issued_by');
+    }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(StoreManagerActivity::class);
     }
 }

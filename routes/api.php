@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\Admin\CustomerController;
 use App\Http\Controllers\Api\Admin\DepartmentController;
 use App\Http\Controllers\Api\Admin\EmployeeController;
 use App\Http\Controllers\Api\Admin\JobCardController;
+use App\Http\Controllers\Api\Admin\JobCardEstimateController;
+use App\Http\Controllers\Api\Admin\JobCardInvoiceController;
 use App\Http\Controllers\Api\Admin\JobCardPartController;
 use App\Http\Controllers\Api\Admin\JobCardTaskController;
 use App\Http\Controllers\Api\Admin\MechanicCoordinatorTaskController;
@@ -17,6 +19,8 @@ use App\Http\Controllers\Api\Admin\StockMovementController;
 use App\Http\Controllers\Api\Admin\VehicleController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CustomerAuthController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PublicCustomerController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -285,6 +289,32 @@ Route::middleware('auth:sanctum')
                 [JobCardTaskController::class, 'updateStatus']
             )->middleware('permission:job-cards-tasks.status.update');
         });
+
+        // Job Card Estimate Bill Routes
+        Route::get(
+            '/job-cards/{jobCard}/estimate',
+            [JobCardEstimateController::class, 'show']
+        );
+
+        Route::post(
+            '/job-cards/{jobCard}/estimate',
+            [JobCardEstimateController::class, 'store']
+        );
+        // Job Card Final Bill
+        Route::get(
+            '/job-cards/{jobCard}/invoice',
+            [JobCardInvoiceController::class, 'show']
+        );
+
+        Route::post(
+            '/job-cards/{jobCard}/invoice',
+            [JobCardInvoiceController::class, 'store']
+        );
+        Route::post(
+            '/job-cards/{jobCard}/invoice/generate',
+            [JobCardInvoiceController::class, 'generate']
+        );
+
         /*
     |--------------------------------------------------------------------------
     | Permission Management
@@ -391,6 +421,16 @@ Route::middleware('auth:sanctum')
                 Route::get('/{stockMovement}', [StockMovementController::class, 'show']);
             });
 
+        // job CardS Parts
+        Route::get(
+            '/job-card-parts/pending',
+            [JobCardPartController::class, 'pendingRequests']
+        );
+
+        Route::patch(
+            '/job-card-parts/{jobCardPart}/viewed',
+            [JobCardPartController::class, 'markViewed']
+        );
         Route::prefix('/job-cards/{jobCard}/parts')
             ->group(function () {
                 Route::get('/', [JobCardPartController::class, 'index']);
@@ -401,6 +441,23 @@ Route::middleware('auth:sanctum')
                 Route::patch('/{jobCardPart}/issue', [JobCardPartController::class, 'issue']);
                 Route::patch('/{jobCardPart}/return', [JobCardPartController::class, 'returnPart']);
             });
+
+        // Auto Store Manager
+        Route::get(
+            '/store-manager/activity-history',
+            [JobCardPartController::class, 'activityHistory']
+        );
+
+        // Notification Routes
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::get(
+            '/notifications/unread-count',
+            [NotificationController::class, 'unreadCount']
+        );
+        Route::patch(
+            '/notifications/{id}/read',
+            [NotificationController::class, 'markAsRead']
+        );
     });
 
 
@@ -430,3 +487,7 @@ Route::prefix('customer')->group(function () {
         );
     });
 });
+Route::get(
+    '/public/customer/{token}',
+    [PublicCustomerController::class, 'show']
+);

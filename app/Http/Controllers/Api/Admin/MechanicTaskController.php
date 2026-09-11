@@ -8,6 +8,8 @@ use App\Models\Employee;
 use App\Models\JobCardTask;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Models\User;
+use App\Notifications\TaskCompletedNotification;
 
 class MechanicTaskController extends Controller
 {
@@ -199,6 +201,60 @@ class MechanicTaskController extends Controller
         }
 
         $task->update($updateData);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Notify Admin + Coordinator When Mechanic Completes Task
+        |--------------------------------------------------------------------------
+        */
+
+        if ($newStatus === 'completed') {
+            $task->load([
+                'jobCard:id,job_card_number,advisor_id',
+                'jobCard.advisor:id,user_id',
+                'jobCard.advisor.user:id,name',
+            ]);
+
+            $usersToNotify = collect();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Notify Advisor
+            |--------------------------------------------------------------------------
+            */
+
+            if ($task->jobCard->advisor?->user) {
+                $usersToNotify->push(
+                    $task->jobCard->advisor->user
+                );
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Notify Mechanic Coordinators
+            |--------------------------------------------------------------------------
+            */
+
+            $coordinators = User::role(
+                'Mechanic Coordinator'
+            )->get();
+
+            foreach ($coordinators as $coordinator) {
+                $usersToNotify->push($coordinator);
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Send Notifications
+            |--------------------------------------------------------------------------
+            */
+
+            foreach ($usersToNotify->unique('id') as $user) {
+                $user->notify(
+                    new TaskCompletedNotification($task)
+                );
+            }
+        }
 
         return ApiResponse::success(
             $task->fresh()->load([

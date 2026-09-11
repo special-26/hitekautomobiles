@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Bay;
 use App\Models\Employee;
 use App\Models\JobCard;
+use App\Models\User;
 use App\Models\Vehicle;
+use App\Notifications\JobCardCreatedNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -55,6 +57,22 @@ class JobCardController extends Controller
             'estimated_cost' => ['nullable', 'numeric', 'min:0',],
             'estimated_completion_at' => ['nullable', 'date',],
         ]);
+
+        if ($request->user()->hasRole('Advisor')) {
+            $advisorEmployee = Employee::query()
+                ->where('user_id', $request->user()->id)
+                ->where('status', 'active')
+                ->first();
+
+            if (! $advisorEmployee) {
+                return ApiResponse::error(
+                    'Your employee profile could not be found.',
+                    422
+                );
+            }
+
+            $validated['advisor_id'] = $advisorEmployee->id;
+        }
 
         /* 
         |-------------------------------------------------------------------------- 
@@ -122,14 +140,28 @@ class JobCardController extends Controller
             return JobCard::create($validated);
         });
 
+        $jobCard->load([
+            'customer:id,customer_code,name,phone',
+            'vehicle:id,customer_id,registration_number,make,model,variant',
+            'department:id,name',
+            'bay:id,name,code',
+            'advisor:id,user_id',
+        ]);
+
+        $usersToNotify = User::role([
+            'Super Admin',
+            'Admin',
+            'Mechanic Coordinator',
+        ])->get();
+
+        foreach ($usersToNotify as $user) {
+            $user->notify(
+                new JobCardCreatedNotification($jobCard)
+            );
+        }
+
         return ApiResponse::success(
-            $jobCard->load([
-                'customer:id,customer_code,name,phone',
-                'vehicle:id,customer_id,registration_number,make,model,variant',
-                'department:id,name',
-                'bay:id,name,code',
-                'advisor:id,user_id',
-            ]),
+            $jobCard,
             'Job card created successfully.',
             201
         );

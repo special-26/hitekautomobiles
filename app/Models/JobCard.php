@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Models\Bay;
 use App\Models\Customer;
 use App\Models\Employee;
+use App\Models\JobCardEstimate;
+use App\Models\JobCardInvoice;
 use App\Models\JobCardTask;
 use App\Models\ServiceBooking;
 use App\Models\Vehicle;
@@ -101,6 +103,16 @@ class JobCard extends Model
     public function parts(): HasMany
     {
         return $this->hasMany(JobCardPart::class);
+    }
+
+    public function estimates(): HasMany
+    {
+        return $this->hasMany(JobCardEstimate::class);
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(JobCardInvoice::class);
     }
 
     // public function photos(): HasMany

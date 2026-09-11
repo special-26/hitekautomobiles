@@ -27,6 +27,10 @@ return new class extends Migration
             $table->string('customer_code')
                 ->unique();
 
+            $table->string('public_token', 64)
+                ->nullable()
+                ->unique();
+
             $table->string('name');
 
             $table->string('phone')
