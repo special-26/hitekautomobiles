@@ -30,6 +30,10 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
             AdminCreateSeeder::class,
+            PartCategorySeeder::class,
+            AssignPartCategoriesSeeder::class,
+            PartSeeder::class,
+            VehicleCatalogSeeder::class,
         ]);
     }
 }

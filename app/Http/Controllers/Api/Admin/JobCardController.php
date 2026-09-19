@@ -401,7 +401,7 @@ class JobCardController extends Controller
             'type' => [
                 'required',
                 'string',
-                'in:job_card_created,vehicle_ready',
+                'in:job_card_created,vehicle_ready,estimate,final',
             ],
         ]);
 
@@ -418,10 +418,16 @@ class JobCardController extends Controller
 
         $message = match ($request->type) {
             'job_card_created' =>
-            $messages->jobCardCreated($jobCard),
+                $messages->jobCardCreated($jobCard),
 
             'vehicle_ready' =>
-            $messages->vehicleReady($jobCard),
+                $messages->vehicleReady($jobCard),
+
+            'estimate' =>
+                $messages->estimateBill($jobCard),
+
+            'final' =>
+                $messages->finalBill($jobCard),
 
             default => null,
         };
