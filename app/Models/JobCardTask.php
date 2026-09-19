@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\JobCard;
 use App\Models\JobCardPart;
+use App\Models\ServiceTask;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -14,6 +15,7 @@ class JobCardTask extends Model
 {
     protected $fillable = [
         'job_card_id',
+        'service_task_id',
         'department_id',
         'bay_id',
         'assigned_to',
@@ -67,5 +69,13 @@ class JobCardTask extends Model
     public function parts()
     {
         return $this->hasMany(JobCardPart::class, 'job_card_task_id');
+    }
+
+    public function serviceTask(): BelongsTo
+    {
+        return $this->belongsTo(
+            ServiceTask::class,
+            'service_task_id'
+        );
     }
 }

@@ -3,9 +3,14 @@
 namespace App\Models;
 
 use App\Models\JobCardPart;
+use App\Models\PartCategory;
+use App\Models\ServiceTask;
 use App\Models\StockMovement;
+use App\Models\VehicleModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Part extends Model
 {
@@ -32,6 +37,21 @@ class Part extends Model
         'is_active' => 'boolean',
     ];
 
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(PartCategory::class, 'part_category_id');
+    }
+
+    public function vehicleModels(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            VehicleModel::class,
+            'model_parts',
+            'part_id',
+            'vehicle_model_id'
+        )->withTimestamps();
+    }
+
     public function stockMovements()
     {
         return $this->hasMany(StockMovement::class);
@@ -40,5 +60,19 @@ class Part extends Model
     public function jobCardParts()
     {
         return $this->hasMany(JobCardPart::class);
+    }
+
+
+    public function serviceTasks(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ServiceTask::class,
+            'service_task_parts',
+            'part_id',
+            'service_task_id'
+        )->withPivot([
+            'default_quantity',
+            'is_required',
+        ])->withTimestamps();
     }
 }

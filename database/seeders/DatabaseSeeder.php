@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Database\Seeders\AdminCreateSeeder;
 use Database\Seeders\DevelopmentSeeder;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RoleSeeder;
@@ -24,10 +25,11 @@ class DatabaseSeeder extends Seeder
         //         'email_verified_at' => now(),
         //     ]
         // );
-        
+
         $this->call([
             PermissionSeeder::class,
             RoleSeeder::class,
+            AdminCreateSeeder::class,
         ]);
     }
 }

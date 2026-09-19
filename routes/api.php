@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\Admin\MechanicTaskController;
 use App\Http\Controllers\Api\Admin\PartController;
 use App\Http\Controllers\Api\Admin\PermissionController;
 use App\Http\Controllers\Api\Admin\RoleController;
+use App\Http\Controllers\Api\Admin\ServiceTaskController;
 use App\Http\Controllers\Api\Admin\StockMovementController;
 use App\Http\Controllers\Api\Admin\VehicleController;
 use App\Http\Controllers\Api\AuthController;
@@ -36,25 +37,25 @@ Route::middleware('auth:sanctum')->group(function () {
 | Super Admin - Admin Accounts
 |--------------------------------------------------------------------------
 */
-Route::middleware('permission:owner.admins.manage')->group(function () {
+Route::middleware('permission:owner.admins.manage')->prefix('owner/admins')->group(function () {
 
     Route::get(
-        '/owner/admins',
+        '/',
         [AdminController::class, 'index']
     );
 
     Route::post(
-        '/owner/admins',
+        '/',
         [AdminController::class, 'store']
     );
 
     Route::put(
-        '/owner/admins/{user}',
+        '/{user}',
         [AdminController::class, 'update']
     );
 
     Route::patch(
-        '/owner/admins/{user}/status',
+        '/{user}/status',
         [AdminController::class, 'updateStatus']
     );
 });
@@ -207,113 +208,237 @@ Route::middleware('auth:sanctum')
     | Vehicles
     |--------------------------------------------------------------------------
     */
+
+        Route::prefix('vehicles')->group(function () {
+            Route::get(
+                '/',
+                [VehicleController::class, 'index']
+            )->middleware('permission:vehicles.view');
+
+            Route::post(
+                '/',
+                [VehicleController::class, 'store']
+            )->middleware('permission:vehicles.create');
+
+            Route::get(
+                '/{vehicle}',
+                [VehicleController::class, 'show']
+            )->middleware('permission:vehicles.view');
+
+            Route::put(
+                '/{vehicle}',
+                [VehicleController::class, 'update']
+            )->middleware('permission:vehicles.update');
+
+            Route::patch(
+                '/{vehicle}/status',
+                [VehicleController::class, 'updateStatus']
+            )->middleware('permission:vehicles.status.update');
+
+            // ==========================================
+            // VEHICLE CATALOG
+            // ==========================================
+
+            Route::get(
+                '/catalog/brands',
+                [VehicleController::class, 'catalogBrands']
+            );
+
+            Route::get(
+                '/catalog/brands/{vehicleBrand}/models',
+                [VehicleController::class, 'catalogModels']
+            );
+
+            // ==========================================
+            // PART CATEGORIES
+            // ==========================================
+
+            Route::get(
+                '/catalog/part-categories',
+                [VehicleController::class, 'partCategories']
+            );
+
+            // ==========================================
+            // MODEL-PART ASSIGNMENT
+            // ==========================================
+
+            Route::get(
+                '/catalog/models/{vehicleModel}/parts',
+                [VehicleController::class, 'assignedParts']
+            );
+
+            Route::get(
+                '/catalog/models/{vehicleModel}/available-parts',
+                [VehicleController::class, 'availableParts']
+            );
+
+            Route::post(
+                '/catalog/models/{vehicleModel}/parts',
+                [VehicleController::class, 'assignPart']
+            );
+
+            Route::delete(
+                '/catalog/models/{vehicleModel}/parts/{part}',
+                [VehicleController::class, 'removePart']
+            );
+        });
+
+        /*
+    ----------------------------------------------------------------------
+    | Predefined service tasks
+    |----------------------------------------------------------------------
+    */
+        Route::prefix('service-tasks')->group(function () {
+            Route::get('/', [
+                ServiceTaskController::class,
+                'index',
+            ]);
+
+            Route::post('/', [
+                ServiceTaskController::class,
+                'store',
+            ]);
+
+            Route::get('/{serviceTask}', [
+                ServiceTaskController::class,
+                'show',
+            ]);
+
+            Route::put('/{serviceTask}', [
+                ServiceTaskController::class,
+                'update',
+            ]);
+
+            Route::patch('/{serviceTask}/status', [
+                ServiceTaskController::class,
+                'updateStatus',
+            ]);
+
+            // Suggested parts
+            Route::post('/{serviceTask}/parts', [
+                ServiceTaskController::class,
+                'addPart',
+            ]);
+
+            Route::put('/{serviceTask}/parts/{serviceTaskPart}', [
+                ServiceTaskController::class,
+                'updatePart',
+            ]);
+
+            Route::delete('/{serviceTask}/parts/{serviceTaskPart}', [
+                ServiceTaskController::class,
+                'removePart',
+            ]);
+        });
+        // Add parts in predefined-task
         Route::get(
-            '/vehicles',
-            [VehicleController::class, 'index']
-        )->middleware('permission:vehicles.view');
-
-        Route::post(
-            '/vehicles',
-            [VehicleController::class, 'store']
-        )->middleware('permission:vehicles.create');
-
-        Route::get(
-            '/vehicles/{vehicle}',
-            [VehicleController::class, 'show']
-        )->middleware('permission:vehicles.view');
-
-        Route::put(
-            '/vehicles/{vehicle}',
-            [VehicleController::class, 'update']
-        )->middleware('permission:vehicles.update');
-
-        Route::patch(
-            '/vehicles/{vehicle}/status',
-            [VehicleController::class, 'updateStatus']
-        )->middleware('permission:vehicles.status.update');
+            '/parts/search',
+            [ServiceTaskController::class, 'searchParts']
+        );
 
         /*
     ----------------------------------------------------------------------
     | JobCard Routes - for admin, advisor, manager
     |----------------------------------------------------------------------
     */
-        Route::get(
-            '/job-cards',
-            [JobCardController::class, 'index']
-        )->middleware('permission:job-cards.view');
-        Route::post(
-            '/job-cards',
-            [JobCardController::class, 'store']
-        )->middleware('permission:job-cards.create');
-        Route::get(
-            '/job-cards/{jobCard}',
-            [JobCardController::class, 'show']
-        )->middleware('permission:job-cards.view');
-        Route::put(
-            '/job-cards/{jobCard}',
-            [JobCardController::class, 'update']
-        )->middleware('permission:job-cards.update');
-        Route::patch(
-            '/job-cards/{jobCard}/status',
-            [JobCardController::class, 'updateStatus']
-        )->middleware('permission:job-cards.status.update');
-        Route::patch(
-            '/job-cards/{jobCard}/workflow-status',
-            [JobCardController::class, 'updateWorkflowStatus']
-        )->middleware('permission:job-cards.status.update');
-
-        // Job Card Task Routes
-        Route::prefix('job-cards/{jobCard}/tasks')->group(function () {
+        Route::prefix('job-cards')->group(function () {
             Route::get(
                 '/',
-                [JobCardTaskController::class, 'index']
-            )->middleware('permission:job-cards-tasks.view');
-
+                [JobCardController::class, 'index']
+            )->middleware('permission:job-cards.view');
             Route::post(
                 '/',
-                [JobCardTaskController::class, 'store']
-            )->middleware('permission:job-cards-tasks.create');
-
+                [JobCardController::class, 'store']
+            )->middleware('permission:job-cards.create');
             Route::get(
-                '/{task}',
-                [JobCardTaskController::class, 'show']
-            )->middleware('permission:job-cards-tasks.view');
-
+                '/{jobCard}',
+                [JobCardController::class, 'show']
+            )->middleware('permission:job-cards.view');
             Route::put(
-                '/{task}',
-                [JobCardTaskController::class, 'update']
-            )->middleware('permission:job-cards-tasks.update');
-
+                '/{jobCard}',
+                [JobCardController::class, 'update']
+            )->middleware('permission:job-cards.update');
             Route::patch(
-                '/{task}/status',
-                [JobCardTaskController::class, 'updateStatus']
-            )->middleware('permission:job-cards-tasks.status.update');
+                '/{jobCard}/status',
+                [JobCardController::class, 'updateStatus']
+            )->middleware('permission:job-cards.status.update');
+            Route::patch(
+                '/{jobCard}/workflow-status',
+                [JobCardController::class, 'updateWorkflowStatus']
+            )->middleware('permission:job-cards.status.update');
+
+            // Whatsapp Notification
+            Route::post(
+                '/{jobCard}/whatsapp',
+                [JobCardController::class, 'whatsappMessage']
+            );
+
+            // Job Card Task Routes
+            Route::prefix('{jobCard}/tasks')->group(function () {
+                Route::get(
+                    '/',
+                    [JobCardTaskController::class, 'index']
+                )->middleware('permission:job-cards-tasks.view');
+
+                Route::post(
+                    '/',
+                    [JobCardTaskController::class, 'store']
+                )->middleware('permission:job-cards-tasks.create');
+
+                Route::get(
+                    '/{task}',
+                    [JobCardTaskController::class, 'show']
+                )->middleware('permission:job-cards-tasks.view');
+
+                Route::put(
+                    '/{task}',
+                    [JobCardTaskController::class, 'update']
+                )->middleware('permission:job-cards-tasks.update');
+
+                Route::patch(
+                    '/{task}/status',
+                    [JobCardTaskController::class, 'updateStatus']
+                )->middleware('permission:job-cards-tasks.status.update');
+
+                // Job Card Parts Routes
+                Route::prefix('{task}/parts')->group(function () {
+                    Route::get(
+                        '/',
+                        [JobCardPartController::class, 'index']
+                    )->middleware('permission:job-card-parts.view');
+
+                    Route::post(
+                        '/',
+                        [JobCardPartController::class, 'store']
+                    )->middleware('permission:job-card-parts.create');
+                });
+            });
+
+            // Job Card Estimate Bill Routes
+            Route::get(
+                '/{jobCard}/estimate',
+                [JobCardEstimateController::class, 'show']
+            );
+
+            Route::post(
+                '/{jobCard}/estimate',
+                [JobCardEstimateController::class, 'store']
+            );
+            // Job Card Final Bill
+            Route::get(
+                '/{jobCard}/invoice',
+                [JobCardInvoiceController::class, 'show']
+            );
+
+            Route::post(
+                '/{jobCard}/invoice',
+                [JobCardInvoiceController::class, 'store']
+            );
+            Route::post(
+                '/{jobCard}/invoice/generate',
+                [JobCardInvoiceController::class, 'generate']
+            );
         });
-
-        // Job Card Estimate Bill Routes
-        Route::get(
-            '/job-cards/{jobCard}/estimate',
-            [JobCardEstimateController::class, 'show']
-        );
-
-        Route::post(
-            '/job-cards/{jobCard}/estimate',
-            [JobCardEstimateController::class, 'store']
-        );
-        // Job Card Final Bill
-        Route::get(
-            '/job-cards/{jobCard}/invoice',
-            [JobCardInvoiceController::class, 'show']
-        );
-
-        Route::post(
-            '/job-cards/{jobCard}/invoice',
-            [JobCardInvoiceController::class, 'store']
-        );
-        Route::post(
-            '/job-cards/{jobCard}/invoice/generate',
-            [JobCardInvoiceController::class, 'generate']
-        );
 
         /*
     |--------------------------------------------------------------------------
@@ -354,7 +479,7 @@ Route::middleware('auth:sanctum')
 
         /*
     |--------------------------------------------------------------------------
-    | Role Management
+    | Mechanic Routes
     |--------------------------------------------------------------------------
     */
         Route::prefix('mechanic/tasks')
@@ -420,6 +545,7 @@ Route::middleware('auth:sanctum')
                 Route::post('/', [StockMovementController::class, 'store']);
                 Route::get('/{stockMovement}', [StockMovementController::class, 'show']);
             });
+
 
         // job CardS Parts
         Route::get(

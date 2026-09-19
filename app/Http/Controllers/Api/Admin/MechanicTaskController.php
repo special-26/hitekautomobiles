@@ -132,6 +132,28 @@ class MechanicTaskController extends Controller
         $currentStatus = $task->status;
         $newStatus = $validated['status'];
 
+        /*
+        |--------------------------------------------------------------------------
+        | Prevent Completion With Pending Parts
+        |--------------------------------------------------------------------------
+        */
+
+        if ($newStatus === 'completed') {
+            $task->loadMissing([
+                'parts:id,job_card_task_id,status',
+            ]);
+
+            $hasPendingParts = $task->parts
+                ->contains(fn($part) => $part->status === 'pending');
+
+            if ($hasPendingParts) {
+                return ApiResponse::error(
+                    'Task cannot be completed while parts are pending.',
+                    422
+                );
+            }
+        }
+
         $allowedTransitions = [
             'assigned' => [
                 'in_progress',

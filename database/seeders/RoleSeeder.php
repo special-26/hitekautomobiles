@@ -188,43 +188,61 @@ class RoleSeeder extends Seeder
             'job-cards-tasks.create',
             'job-cards-tasks.update',
             'job-cards-tasks.status.update',
+
+            // Service Task Catalog
+            'service-tasks.view',
+            'service-tasks.create',
+            'service-tasks.update',
+            'service-tasks.status.update',
+
+            // Service Task Suggested Parts
+            'service-task-parts.view',
+            'service-task-parts.create',
+            'service-task-parts.remove',
+
         ]);
 
         // Advisor
         $advisor->syncPermissions([
             'dashboard.view',
 
+            // Customers
             'customers.view',
             'customers.create',
             'customers.update',
 
-            // Employees
-            'employees.view',
-
-            'departments.view',
-
+            // Vehicles
             'vehicles.view',
             'vehicles.create',
             'vehicles.update',
 
+            // Employees - View only if required for display
+            'employees.view',
+
+            // Departments
+            'departments.view',
+
+            // Bays - View only
+            'bays.view',
+
+            // Job Cards
             'job-cards.view',
             'job-cards.create',
             'job-cards.update',
             'job-cards.status.update',
 
-            // Parts
-            'parts.view',
-            'parts.create',
-            'parts.update',
-            'parts.status.update',
+            'job-card-parts.view',
 
-            // Job Card Task Permissions
+            // Job Card Tasks
             'job-cards-tasks.view',
             'job-cards-tasks.create',
             'job-cards-tasks.update',
-            'job-cards-tasks.status.update',
 
-            'bays.view',
+            // Billing
+            'job-cards.estimate.create',
+            'job-cards.estimate.update',
+            'job-cards.final-bill.create',
+            'job-cards.final-bill.update',
         ]);
 
         // Floor Manager
@@ -271,7 +289,11 @@ class RoleSeeder extends Seeder
             'parts.return',
             'parts.adjust',
             'parts.suppliers.manage',
+
+            // Job Card Parts
+            'job-card-parts.view',
         ]);
+
         // General Store Manager
         $generalStoreManager->syncPermissions([
             'dashboard.view',
@@ -303,31 +325,45 @@ class RoleSeeder extends Seeder
         $mechanicCoordinator->syncPermissions([
             'dashboard.view',
 
+            // Employees
             'employees.view',
 
+            // Departments
             'departments.view',
 
-            'job-cards.view',
-            'job-cards.create',
-            'job-cards.update',
-            'job-cards.status.update',
+            // Customers - View only
+            'customers.view',
 
-            // Job Card Task Permissions
+            // Vehicles - View only
+            'vehicles.view',
+
+            // Job Cards
+            'job-cards.view',
+            'job-cards.update',
+
+            // Job Card Tasks
             'job-cards-tasks.view',
             'job-cards-tasks.create',
             'job-cards-tasks.update',
             'job-cards-tasks.status.update',
 
+            // Mechanic and Bay Assignment
+            'job-cards-tasks.assign-mechanic',
+            'job-cards-tasks.assign-bay',
+
+            // Bays
             'bays.view',
             'bays.update',
 
-            // Employees
-            'employees.view',
-            'employees.create',
-            'employees.update',
-            'employees.status.update',
-
+            // Parts - Catalog View Only
             'parts.view',
+
+            // Job Card Parts
+            'job-card-parts.view',
+            'job-card-parts.request',
+            'job-card-parts.create',
+            'job-card-parts.update',
+            'job-card-parts.remove',
         ]);
 
         $customer->syncPermissions([
@@ -354,6 +390,7 @@ class RoleSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
         $AdminUser = User::firstOrCreate(
             [
                 'email' => 'admin@hitekautomobiles.com',

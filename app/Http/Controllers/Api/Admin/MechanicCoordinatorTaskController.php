@@ -91,7 +91,7 @@ class MechanicCoordinatorTaskController extends Controller
                 END
             ")
             ->orderBy('id')
-            ->get();
+            ->paginate($request->integer('per_page', 20));
 
         return ApiResponse::success(
             $tasks,
@@ -381,11 +381,15 @@ class MechanicCoordinatorTaskController extends Controller
         |--------------------------------------------------------------------------
         */
 
+        $oldAssignedTo = $task->assigned_to;
+
         $task->update([
             'department_id' => $validated['department_id'],
             'bay_id' => $validated['bay_id'] ?? null,
             'assigned_to' => $validated['assigned_to'] ?? null,
         ]);
+
+        $assignmentChanged = $oldAssignedTo != $task->assigned_to;
 
         /*
         |--------------------------------------------------------------------------
@@ -393,7 +397,10 @@ class MechanicCoordinatorTaskController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        if (! empty($validated['assigned_to'])) {
+        if (
+            $assignmentChanged &&
+            ! empty($validated['assigned_to'])
+        ) {
             $employee->load('user');
 
             if ($employee->user) {

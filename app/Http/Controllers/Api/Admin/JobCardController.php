@@ -10,6 +10,8 @@ use App\Models\JobCard;
 use App\Models\User;
 use App\Models\Vehicle;
 use App\Notifications\JobCardCreatedNotification;
+use App\Services\WhatsApp\WhatsAppMessageService;
+use App\Services\WhatsApp\WhatsAppService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -354,5 +356,91 @@ class JobCardController extends Controller
             $jobCard->fresh(),
             'Job card workflow status updated successfully.'
         );
+    }
+
+    // WhatsApp Function
+    public function whatsappJobCardCreated(
+        JobCard $jobCard,
+        WhatsAppService $whatsapp,
+        WhatsAppMessageService $messages
+    ) {
+        $jobCard->load([
+            'customer',
+            'vehicle',
+        ]);
+
+        if (!$jobCard->customer?->phone) {
+            return response()->json([
+                'message' => 'Customer phone number is not available.',
+            ], 422);
+        }
+
+        $message = $messages->jobCardCreated($jobCard);
+
+        $url = $whatsapp->createChatUrl(
+            $jobCard->customer->phone,
+            $message
+        );
+
+        return response()->json([
+            'data' => [
+                'phone' => $jobCard->customer->phone,
+                'message' => $message,
+                'url' => $url,
+            ],
+        ]);
+    }
+
+    public function whatsappMessage(
+        Request $request,
+        JobCard $jobCard,
+        WhatsAppService $whatsapp,
+        WhatsAppMessageService $messages
+    ) {
+        $request->validate([
+            'type' => [
+                'required',
+                'string',
+                'in:job_card_created,vehicle_ready',
+            ],
+        ]);
+
+        $jobCard->load([
+            'customer',
+            'vehicle',
+        ]);
+
+        if (!$jobCard->customer?->phone) {
+            return response()->json([
+                'message' => 'Customer phone number is not available.',
+            ], 422);
+        }
+
+        $message = match ($request->type) {
+            'job_card_created' =>
+            $messages->jobCardCreated($jobCard),
+
+            'vehicle_ready' =>
+            $messages->vehicleReady($jobCard),
+
+            default => null,
+        };
+
+        if (!$message) {
+            return response()->json([
+                'message' => 'Unsupported WhatsApp message type.',
+            ], 422);
+        }
+
+        $url = $whatsapp->createChatUrl(
+            $jobCard->customer->phone,
+            $message
+        );
+
+        return response()->json([
+            'phone' => $jobCard->customer->phone,
+            'message' => $message,
+            'url' => $url,
+        ]);
     }
 }

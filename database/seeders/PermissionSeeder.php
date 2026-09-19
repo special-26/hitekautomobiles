@@ -52,6 +52,34 @@ class PermissionSeeder extends Seeder
             'job-cards-tasks.update',
             'job-cards-tasks.status.update',
 
+            // Mechanic Coordinator - Task Execution
+            'job-cards-tasks.assign-mechanic',
+            'job-cards-tasks.assign-bay',
+
+            // Service Task Catalog - Admin
+            'service-tasks.view',
+            'service-tasks.create',
+            'service-tasks.update',
+            'service-tasks.status.update',
+
+            // Service Task Suggested Parts
+            'service-task-parts.view',
+            'service-task-parts.create',
+            'service-task-parts.remove',
+
+            // Job Card Parts
+            'job-card-parts.view',
+            'job-card-parts.request',
+            'job-card-parts.create',
+            'job-card-parts.update',
+            'job-card-parts.remove',
+
+            // Billing
+            'job-cards.estimate.create',
+            'job-cards.estimate.update',
+            'job-cards.final-bill.create',
+            'job-cards.final-bill.update',
+
             // Bays
             'bays.view',
             'bays.create',

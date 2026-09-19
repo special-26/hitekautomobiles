@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\JobCard;
 use App\Models\JobCardTask;
+use App\Models\ServiceTask;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Notifications\JobCardTaskCreatedNotification;
 use Illuminate\Http\Request;
@@ -17,6 +19,12 @@ class JobCardTaskController extends Controller
     /** * List tasks for a job card */
     public function index(JobCard $jobCard)
     {
+        abort_unless(
+            $this->hasPermission('job-cards-tasks.view'),
+            403,
+            'You do not have permission to view job card tasks.'
+        );
+
         $tasks = $jobCard->tasks()
             ->with([
                 'department:id,name',
@@ -37,6 +45,12 @@ class JobCardTaskController extends Controller
     /** * Create task */
     public function store(Request $request, JobCard $jobCard)
     {
+        abort_unless(
+            $this->hasPermission('job-cards-tasks.create'),
+            403,
+            'You do not have permission to create job card tasks.'
+        );
+
         $validated = $request->validate([
             'department_id' => [
                 'required',
@@ -50,7 +64,20 @@ class JobCardTaskController extends Controller
             'estimated_minutes' => ['nullable', 'integer', 'min:1',],
             'labour_cost' => ['nullable', 'numeric', 'min:0',],
             'notes' => ['nullable', 'string',],
+            'service_task_id' => [
+                'nullable',
+                'integer',
+                'exists:service_tasks,id',
+            ],
         ]);
+
+        if (! $this->hasPermission('job-cards-tasks.assign-mechanic')) {
+            $validated['assigned_to'] = null;
+        }
+
+        if (! $this->hasPermission('job-cards-tasks.assign-bay')) {
+            $validated['bay_id'] = null;
+        }
 
         /* 
             |-------------------------------------------------------------------------- 
@@ -123,11 +150,61 @@ class JobCardTaskController extends Controller
             }
         }
 
-        $validated['status'] = 'pending';
+        $serviceTask = null;
+        if (! empty($validated['service_task_id'])) {
+            $serviceTask = ServiceTask::query()
+                ->where('is_active', true)
+                ->with([
+                    'taskParts.part',
+                ])
+                ->find($validated['service_task_id']);
 
-        $task = $jobCard->tasks()->create(
-            $validated
-        );
+            if (! $serviceTask) {
+                return ApiResponse::error(
+                    'Selected service task does not exist or is inactive.',
+                    422
+                );
+            }
+        }
+
+        $validated['status'] = 'pending';
+        $task = DB::transaction(function () use (
+            $jobCard,
+            $validated,
+            $serviceTask
+        ) {
+            // Create the job card task
+            $task = $jobCard->tasks()->create($validated);
+
+            // Copy suggested parts from the predefined service task
+            if ($serviceTask) {
+                foreach ($serviceTask->taskParts as $suggestedPart) {
+                    $part = $suggestedPart->part;
+
+                    if (! $part) {
+                        continue;
+                    }
+
+                    $quantity = $suggestedPart->default_quantity;
+
+                    $unitPrice = $part->cost_price ?? 0;
+
+                    $total = $quantity * $unitPrice;
+
+                    $task->parts()->create([
+                        'job_card_id' => $jobCard->id,
+                        'part_id' => $part->id,
+                        'quantity' => $quantity,
+                        'unit_price' => $unitPrice,
+                        'discount' => 0,
+                        'total' => $total,
+                        'status' => 'pending',
+                    ]);
+                }
+            }
+
+            return $task;
+        });
 
         $task->load([
             'jobCard:id,job_card_number',
@@ -135,6 +212,8 @@ class JobCardTaskController extends Controller
             'bay:id,name,code,type',
             'assignedEmployee:id,user_id,employee_code,designation,department_id,status',
             'assignedEmployee.user:id,name',
+            'serviceTask:id,name,slug',
+            'parts.part:id,name,category,cost_price',
         ]);
 
         $usersToNotify = User::role([
@@ -187,19 +266,38 @@ class JobCardTaskController extends Controller
             $task
         );
 
-        $validated = $request->validate([
-            'department_id' => ['required', 'integer', 'exists:departments,id',],
-            'bay_id' => ['nullable', 'integer', 'exists:bays,id',],
-            'assigned_to' => ['nullable', 'integer', 'exists:employees,id',],
-            'title' => ['required', 'string', 'max:150',],
-            'description' => ['nullable', 'string',],
-            'estimated_minutes' => ['nullable', 'integer', 'min:1',],
-            'actual_minutes' => ['nullable', 'integer', 'min:0',],
-            'labour_cost' => ['nullable', 'numeric', 'min:0',],
-            'started_at' => ['nullable', 'date',],
-            'completed_at' => ['nullable', 'date',],
-            'notes' => ['nullable', 'string',],
-        ]);
+        abort_unless(
+            $this->hasPermission('job-cards-tasks.update'),
+            403,
+            'You do not have permission to update job card tasks.'
+        );
+
+        $rules = [
+            'title' => ['sometimes', 'required', 'string', 'max:150'],
+            'description' => ['sometimes', 'nullable', 'string'],
+            'estimated_minutes' => ['sometimes', 'nullable', 'integer', 'min:1'],
+            'labour_cost' => ['sometimes', 'nullable', 'numeric', 'min:0'],
+            'notes' => ['sometimes', 'nullable', 'string'],
+        ];
+        if ($this->hasPermission('job-cards-tasks.assign-mechanic')) {
+            $rules['assigned_to'] = [
+                'sometimes',
+                'nullable',
+                'integer',
+                'exists:employees,id',
+            ];
+        }
+
+        if ($this->hasPermission('job-cards-tasks.assign-bay')) {
+            $rules['bay_id'] = [
+                'sometimes',
+                'nullable',
+                'integer',
+                'exists:bays,id',
+            ];
+        }
+
+        $validated = $request->validate($rules);
 
         /* 
         |-------------------------------------------------------------------------- 
@@ -270,6 +368,12 @@ class JobCardTaskController extends Controller
         $this->ensureTaskBelongsToJobCard(
             $jobCard,
             $task
+        );
+
+        abort_unless(
+            $this->hasPermission('job-cards-tasks.status.update'),
+            403,
+            'You do not have permission to update task status.'
         );
 
         $validated = $request->validate([
@@ -364,6 +468,14 @@ class JobCardTaskController extends Controller
             ]),
             'Task status updated successfully.'
         );
+    }
+
+    /**
+     * Check whether the authenticated user has a permission.
+     */
+    private function hasPermission(string $permission): bool
+    {
+        return auth()->user()?->can($permission) ?? false;
     }
 
     /** * Make sure the task belongs to the supplied job card. */

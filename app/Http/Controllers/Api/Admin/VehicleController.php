@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Models\Part;
+use App\Models\PartCategory;
 use App\Models\Vehicle;
+use App\Models\VehicleBrand;
+use App\Models\VehicleModel;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -254,6 +258,191 @@ class VehicleController extends Controller
         return ApiResponse::success(
             $vehicle->fresh(),
             'Vehicle status updated successfully.'
+        );
+    }
+
+
+    // ==========================================
+    // VEHICLE CATALOG - BRANDS & MODELS
+    // ==========================================
+
+    // List brands
+    public function catalogBrands()
+    {
+        $brands = VehicleBrand::query()
+            ->where('is_active', true)
+            ->withCount([
+                'models' => function ($query) {
+                    $query->where('is_active', true);
+                },
+            ])
+            ->orderBy('name')
+            ->get();
+
+        return ApiResponse::success(
+            $brands,
+            'Vehicle brands fetched successfully.'
+        );
+    }
+
+    // List models by brand
+    public function catalogModels(VehicleBrand $vehicleBrand)
+    {
+        $models = $vehicleBrand->models()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return ApiResponse::success(
+            $models,
+            'Vehicle models fetched successfully.'
+        );
+    }
+
+    // ==========================================
+    // PART CATEGORIES
+    // ==========================================
+
+    // List active part categories
+    public function partCategories()
+    {
+        $categories = PartCategory::query()
+            ->where('is_active', true)
+            ->withCount('parts')
+            ->orderBy('name')
+            ->get();
+
+        return ApiResponse::success(
+            $categories,
+            'Part categories fetched successfully.'
+        );
+    }
+
+    // ==========================================
+    // MODEL-PART ASSIGNMENTS
+    // ==========================================
+
+    // List assigned parts
+    public function assignedParts(VehicleModel $vehicleModel)
+    {
+        $parts = $vehicleModel->parts()
+            ->with('category:id,name,slug')
+            ->where('parts.is_active', true)
+            ->orderBy('parts.name')
+            ->get();
+
+        return ApiResponse::success(
+            $parts,
+            'Assigned parts fetched successfully.'
+        );
+    }
+
+    // List available parts
+    public function availableParts(
+        Request $request,
+        VehicleModel $vehicleModel
+    ) {
+        $validated = $request->validate([
+            'category_id' => [
+                'nullable',
+                'integer',
+                'exists:part_categories,id',
+            ],
+            'search' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+        ]);
+
+        $assignedPartIds = $vehicleModel->parts()
+            ->pluck('parts.id');
+
+        $parts = Part::query()
+            ->with('category:id,name,slug')
+            ->where('parts.is_active', true)
+            ->when(
+                $validated['category_id'] ?? null,
+                function ($query, $categoryId) {
+                    $query->where(
+                        'part_category_id',
+                        $categoryId
+                    );
+                }
+            )
+            ->when(
+                $validated['search'] ?? null,
+                function ($query, $search) {
+                    $query->where(function ($query) use ($search) {
+                        $query->where(
+                            'name',
+                            'ilike',
+                            "%{$search}%"
+                        )->orWhere(
+                            'part_number',
+                            'ilike',
+                            "%{$search}%"
+                        );
+                    });
+                }
+            )
+            ->orderBy('name')
+            ->get()
+            ->map(function ($part) use ($assignedPartIds) {
+                $part->is_assigned = $assignedPartIds
+                    ->contains($part->id);
+
+                return $part;
+            });
+
+        return ApiResponse::success(
+            $parts,
+            'Available parts fetched successfully.'
+        );
+    }
+
+    /**
+     * Assign a part to a vehicle model
+     */
+    public function assignPart(
+        Request $request,
+        VehicleModel $vehicleModel
+    ) {
+        $validated = $request->validate([
+            'part_id' => [
+                'required',
+                'integer',
+                'exists:parts,id',
+            ],
+        ]);
+
+        $part = Part::query()
+            ->where('id', $validated['part_id'])
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        $vehicleModel->parts()->syncWithoutDetaching([
+            $part->id,
+        ]);
+
+        return ApiResponse::success(
+            $part,
+            'Part assigned to vehicle model successfully.'
+        );
+    }
+
+    /**
+     * Remove a part from a vehicle model
+     */
+    public function removePart(
+        VehicleModel $vehicleModel,
+        Part $part
+    ) {
+        $vehicleModel->parts()->detach($part->id);
+
+        return ApiResponse::success(
+            null,
+            'Part removed from vehicle model successfully.'
         );
     }
 }

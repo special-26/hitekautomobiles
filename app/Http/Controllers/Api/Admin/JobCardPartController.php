@@ -17,8 +17,19 @@ use App\Notifications\JobCardPartRequestedNotification;
 
 class JobCardPartController extends Controller
 {
+
+    private function authorizePermission(string $permission): void
+    {
+        abort_unless(
+            auth()->user()?->can($permission),
+            403,
+            'You do not have permission to perform this action.'
+        );
+    }
+
     public function pendingRequests()
     {
+        $this->authorizePermission('job-card-parts.view');
         $parts = JobCardPart::query()
             ->where('status', 'pending')
             ->with([
@@ -40,6 +51,7 @@ class JobCardPartController extends Controller
 
     public function activityHistory(Request $request)
     {
+        $this->authorizePermission('job-card-parts.view');
         $activities = StoreManagerActivity::query()
             ->with([
                 'user:id,name',
@@ -60,6 +72,7 @@ class JobCardPartController extends Controller
 
     public function index(JobCard $jobCard)
     {
+        $this->authorizePermission('job-card-parts.view');
         $parts = $jobCard->parts()
             ->with([
                 'part:id,part_number,name,unit',
@@ -77,6 +90,7 @@ class JobCardPartController extends Controller
 
     public function markViewed(JobCardPart $jobCardPart)
     {
+        $this->authorizePermission('job-card-parts.view');
         if ($jobCardPart->status !== 'pending') {
             return ApiResponse::error(
                 'Only pending part requests can be viewed.',
@@ -106,6 +120,7 @@ class JobCardPartController extends Controller
 
     public function store(Request $request, JobCard $jobCard)
     {
+        $this->authorizePermission('job-card-parts.request');
         $validated = $request->validate([
             'part_id' => [
                 'required',
@@ -244,6 +259,7 @@ class JobCardPartController extends Controller
 
     public function show(JobCard $jobCard, JobCardPart $jobCardPart)
     {
+        $this->authorizePermission('job-card-parts.view');
         if ($jobCardPart->job_card_id !== $jobCard->id) {
             abort(404);
         }
@@ -263,6 +279,7 @@ class JobCardPartController extends Controller
         JobCard $jobCard,
         JobCardPart $jobCardPart
     ) {
+        $this->authorizePermission('job-card-parts.update');
         if ($jobCardPart->job_card_id !== $jobCard->id) {
             abort(404);
         }
@@ -354,6 +371,7 @@ class JobCardPartController extends Controller
 
     public function destroy(JobCard $jobCard, JobCardPart $jobCardPart)
     {
+        $this->authorizePermission('job-card-parts.remove');
         if ($jobCardPart->job_card_id !== $jobCard->id) {
             abort(404);
         }
@@ -378,6 +396,7 @@ class JobCardPartController extends Controller
         JobCard $jobCard,
         JobCardPart $jobCardPart
     ) {
+        $this->authorizePermission('parts.issue');
         if ($jobCardPart->job_card_id !== $jobCard->id) {
             abort(404);
         }
@@ -393,16 +412,38 @@ class JobCardPartController extends Controller
             $jobCardPart,
             $request
         ) {
-            $part = Part::whereKey($jobCardPart->part_id)
+            $lockedJobCardPart = JobCardPart::whereKey(
+                $jobCardPart->id
+            )
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $quantity = (float) $jobCardPart->quantity;
+            if ($lockedJobCardPart->job_card_id !== $jobCardPart->job_card_id) {
+                abort(404);
+            }
+
+            if ($lockedJobCardPart->status !== 'pending') {
+                abort(
+                    422,
+                    'Only pending parts can be issued.'
+                );
+            }
+
+            $part = Part::whereKey(
+                $lockedJobCardPart->part_id
+            )
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $quantity = (float) $lockedJobCardPart->quantity;
             $previousStock = (float) $part->current_stock;
             $newStock = $previousStock - $quantity;
 
             if ($newStock < 0) {
-                abort(422, 'Insufficient stock available.');
+                abort(
+                    422,
+                    'Insufficient stock available.'
+                );
             }
 
             $part->update([
@@ -416,25 +457,28 @@ class JobCardPartController extends Controller
                 'previous_stock' => $previousStock,
                 'new_stock' => $newStock,
                 'unit_cost' => $part->cost_price,
-                'reference' => 'JC-' . $jobCardPart->job_card_id,
-                'notes' => 'Issued against Job Card Part #' . $jobCardPart->id,
+                'reference' => 'JC-' . $lockedJobCardPart->job_card_id,
+                'notes' => 'Issued against Job Card Part #'
+                    . $lockedJobCardPart->id,
                 'created_by' => $request->user()->id,
             ]);
 
-            $jobCardPart->update([
+            $lockedJobCardPart->update([
                 'status' => 'issued',
                 'issued_by' => $request->user()->id,
                 'issued_at' => now(),
             ]);
 
-            $jobCardPart->load('part');
+            $lockedJobCardPart->load('part');
 
             StoreManagerActivity::create([
-                'job_card_part_id' => $jobCardPart->id,
-                'user_id' => auth()->id(),
+                'job_card_part_id' => $lockedJobCardPart->id,
+                'user_id' => $request->user()->id,
                 'action' => 'issued',
-                'description' => 'Part issued: ' . $jobCardPart->part->name
-                    . ' × ' . $jobCardPart->quantity,
+                'description' => 'Part issued: '
+                    . $lockedJobCardPart->part->name
+                    . ' × '
+                    . $lockedJobCardPart->quantity,
             ]);
 
             return $movement;
@@ -516,6 +560,7 @@ class JobCardPartController extends Controller
         JobCard $jobCard,
         JobCardPart $jobCardPart
     ) {
+        $this->authorizePermission('parts.return');
         if ($jobCardPart->job_card_id !== $jobCard->id) {
             abort(404);
         }
