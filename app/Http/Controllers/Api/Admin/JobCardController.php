@@ -7,9 +7,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Bay;
 use App\Models\Employee;
 use App\Models\JobCard;
+use App\Models\JobCardInvoiceShareActivity;
 use App\Models\User;
 use App\Models\Vehicle;
 use App\Notifications\JobCardCreatedNotification;
+use App\Services\RazorpayPaymentService;
 use App\Services\WhatsApp\WhatsAppMessageService;
 use App\Services\WhatsApp\WhatsAppService;
 use Illuminate\Http\JsonResponse;
@@ -395,7 +397,7 @@ class JobCardController extends Controller
         Request $request,
         JobCard $jobCard,
         WhatsAppService $whatsapp,
-        WhatsAppMessageService $messages
+        WhatsAppMessageService $messages,
     ) {
         $request->validate([
             'type' => [
@@ -418,16 +420,18 @@ class JobCardController extends Controller
 
         $message = match ($request->type) {
             'job_card_created' =>
-                $messages->jobCardCreated($jobCard),
+            $messages->jobCardCreated($jobCard),
 
             'vehicle_ready' =>
-                $messages->vehicleReady($jobCard),
+            $messages->vehicleReady($jobCard),
 
             'estimate' =>
-                $messages->estimateBill($jobCard),
+            $messages->estimateBill($jobCard),
 
-            'final' =>
-                $messages->finalBill($jobCard),
+            'final' => $this->generateFinalBillMessage(
+                $jobCard,
+                $messages,
+            ),
 
             default => null,
         };
@@ -443,9 +447,204 @@ class JobCardController extends Controller
             $message
         );
 
+        /*
+        |--------------------------------------------------------------------------
+        | Record Invoice Share Activity
+        |--------------------------------------------------------------------------
+        */
+        if (in_array($request->type, ['estimate', 'final'], true)) {
+            $invoice = $jobCard->invoices()
+                ->latest()
+                ->first();
+
+            if ($invoice) {
+                // The final bill flow may have just created a payment link.
+                $invoice->refresh();
+
+                JobCardInvoiceShareActivity::create([
+                    'job_card_invoice_id' => $invoice->id,
+
+                    'shared_by' => auth()->id(),
+
+                    'share_type' => $request->type,
+
+                    'channel' => 'whatsapp',
+
+                    'payment_link_included' =>
+                    $request->type === 'final'
+                        && !empty($invoice->razorpay_payment_link_url),
+
+                    'shared_at' => now(),
+                ]);
+            }
+        }
+
         return response()->json([
             'phone' => $jobCard->customer->phone,
             'message' => $message,
+            'url' => $url,
+        ]);
+    }
+
+    /**
+     * Generate final bill WhatsApp message
+     * with Razorpay payment link.
+     */
+    private function generateFinalBillMessage(
+        JobCard $jobCard,
+        WhatsAppMessageService $messages
+    ): string {
+        return $messages->finalBill($jobCard);
+    }
+
+    // Generate Payment link
+    public function generatePaymentLink(
+        JobCard $jobCard,
+        RazorpayPaymentService $razorpay
+    ) {
+        $invoice = $jobCard->invoices()
+            ->latest()
+            ->first();
+
+        if (!$invoice) {
+            return response()->json([
+                'message' => 'Final bill is not available for this job card.',
+            ], 422);
+        }
+
+        if ((float) $invoice->total <= 0) {
+            return response()->json([
+                'message' => 'Invoice total must be greater than zero.',
+            ], 422);
+        }
+
+        if ($invoice->approval_status !== 'approved') {
+            return response()->json([
+                'message' => 'Invoice must be approved before generating a payment link.',
+            ], 422);
+        }
+
+        if (
+            $invoice->razorpay_payment_status === 'paid'
+        ) {
+            return response()->json([
+                'message' => 'This invoice has already been paid.',
+            ], 422);
+        }
+
+        $paymentLink = $razorpay
+            ->getOrCreateInvoicePaymentLink($invoice);
+
+        $invoice->refresh();
+
+        return response()->json([
+            'message' => 'Payment link generated successfully.',
+            'invoice' => $invoice,
+            'payment_link' => $paymentLink,
+        ]);
+    }
+
+    public function approveInvoice(JobCard $jobCard)
+    {
+        $invoice = $jobCard->invoices()
+            ->latest()
+            ->first();
+
+        if (!$invoice) {
+            return response()->json([
+                'message' => 'Final bill is not available for this job card.',
+            ], 422);
+        }
+
+        if ($invoice->razorpay_payment_status === 'paid') {
+            return response()->json([
+                'message' => 'This invoice has already been paid.',
+            ], 422);
+        }
+
+        if ($invoice->approval_status === 'approved') {
+            return response()->json([
+                'message' => 'This invoice is already approved.',
+                'invoice' => $invoice,
+            ]);
+        }
+
+        $invoice->update([
+            'approval_status' => 'approved',
+            'approved_at' => now(),
+            'approved_by' => auth()->id(),
+        ]);
+
+        $invoice->refresh();
+
+        return response()->json([
+            'message' => 'Invoice approved successfully.',
+            'invoice' => $invoice,
+        ]);
+    }
+
+    public function whatsappPaymentLink(
+        JobCard $jobCard,
+        WhatsAppService $whatsapp,
+        WhatsAppMessageService $messages,
+        RazorpayPaymentService $razorpay
+    ) {
+        $jobCard->load([
+            'customer',
+            'vehicle',
+        ]);
+
+        if (!$jobCard->customer?->phone) {
+            return response()->json([
+                'message' => 'Customer phone number is not available.',
+            ], 422);
+        }
+
+        $invoice = $jobCard->invoices()
+            ->latest()
+            ->first();
+
+        if (!$invoice) {
+            return response()->json([
+                'message' => 'Final bill is not available for this job card.',
+            ], 422);
+        }
+
+        if ($invoice->approval_status !== 'approved') {
+            return response()->json([
+                'message' => 'Invoice must be approved before sharing a payment link.',
+            ], 422);
+        }
+
+        if ($invoice->razorpay_payment_status === 'paid') {
+            return response()->json([
+                'message' => 'This invoice has already been paid.',
+            ], 422);
+        }
+
+        if ((float) $invoice->total <= 0) {
+            return response()->json([
+                'message' => 'Invoice total must be greater than zero.',
+            ], 422);
+        }
+
+        $paymentLink = $razorpay
+            ->getOrCreateInvoicePaymentLink($invoice);
+
+        $message = $messages->paymentLink(
+            $jobCard,
+            $paymentLink
+        );
+
+        $url = $whatsapp->createChatUrl(
+            $jobCard->customer->phone,
+            $message
+        );
+
+        return response()->json([
+            'phone' => $jobCard->customer->phone,
+            'message' => $message,
+            'payment_link' => $paymentLink,
             'url' => $url,
         ]);
     }

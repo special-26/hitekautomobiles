@@ -181,14 +181,6 @@ class VehicleCatalogSeeder extends Seeder
                 'eC3',
             ],
 
-            'Volkswagen' => [
-                'Polo',
-                'Vento',
-                'Virtus',
-                'Taigun',
-                'Tiguan',
-            ],
-
             'Isuzu' => [
                 'D-Max',
                 'MU-X',
@@ -210,6 +202,7 @@ class VehicleCatalogSeeder extends Seeder
                 ],
                 [
                     'name' => $brandName,
+                    'image' => 'images/vehicle-brands/' . Str::slug($brandName) . '.webp',
                     'is_active' => true,
                 ]
             );

@@ -96,40 +96,40 @@ Amount: ₹" . number_format($amount, 2) . "
 Thank you for choosing Hitek Automobiles.";
     }
 
-/**
- * Estimate Bill
- */
-public function estimateBill(JobCard $jobCard): string
-{
-    $customerName = $jobCard->customer?->name ?? 'Customer';
+    /**
+     * Estimate Bill
+     */
+    public function estimateBill(JobCard $jobCard): string
+    {
+        $customerName = $jobCard->customer?->name ?? 'Customer';
 
-    $jobCardNumber = $jobCard->job_card_number
-        ?? $jobCard->id;
+        $jobCardNumber = $jobCard->job_card_number
+            ?? $jobCard->id;
 
-    $vehicle = $jobCard->vehicle;
+        $vehicle = $jobCard->vehicle;
 
-    $vehicleName = trim(
-        ($vehicle?->make ?? '') . ' ' .
-        ($vehicle?->model ?? '')
-    );
+        $vehicleName = trim(
+            ($vehicle?->make ?? '') . ' ' .
+                ($vehicle?->model ?? '')
+        );
 
-    $registrationNumber =
-        $vehicle?->registration_number ?? '';
+        $registrationNumber =
+            $vehicle?->registration_number ?? '';
 
-    $estimate = $jobCard->estimates()
-        ->latest()
-        ->first();
+        $estimate = $jobCard->estimates()
+            ->latest()
+            ->first();
 
-    if (!$estimate) {
-        return "Hello {$customerName},
+        if (!$estimate) {
+            return "Hello {$customerName},
 
 Estimate is not available for Job Card {$jobCardNumber}.
 
 Thank you,
 Hitek Automobiles";
-    }
+        }
 
-    return "Hello {$customerName},
+        return "Hello {$customerName},
 
 Here is the estimate for your vehicle from Hitek Automobiles.
 
@@ -148,43 +148,45 @@ Please review the estimate and contact us if you have any questions.
 
 Thank you,
 Hitek Automobiles";
-}
+    }
 
 
-/**
- * Final Bill
- */
-public function finalBill(JobCard $jobCard): string
-{
-    $customerName = $jobCard->customer?->name ?? 'Customer';
+    /**
+     * Final Bill
+     */
+    public function finalBill(
+        JobCard $jobCard,
+        ?string $paymentLink = null
+    ): string {
+        $customerName = $jobCard->customer?->name ?? 'Customer';
 
-    $jobCardNumber = $jobCard->job_card_number
-        ?? $jobCard->id;
+        $jobCardNumber = $jobCard->job_card_number
+            ?? $jobCard->id;
 
-    $vehicle = $jobCard->vehicle;
+        $vehicle = $jobCard->vehicle;
 
-    $vehicleName = trim(
-        ($vehicle?->make ?? '') . ' ' .
-        ($vehicle?->model ?? '')
-    );
+        $vehicleName = trim(
+            ($vehicle?->make ?? '') . ' ' .
+                ($vehicle?->model ?? '')
+        );
 
-    $registrationNumber =
-        $vehicle?->registration_number ?? '';
+        $registrationNumber =
+            $vehicle?->registration_number ?? '';
 
-    $invoice = $jobCard->invoices()
-        ->latest()
-        ->first();
+        $invoice = $jobCard->invoices()
+            ->latest()
+            ->first();
 
-    if (!$invoice) {
-        return "Hello {$customerName},
+        if (!$invoice) {
+            return "Hello {$customerName},
 
 Final bill is not available for Job Card {$jobCardNumber}.
 
 Thank you,
 Hitek Automobiles";
-    }
+        }
 
-    return "Hello {$customerName},
+        $message = "Hello {$customerName},
 
 Your final bill from Hitek Automobiles is ready.
 
@@ -197,9 +199,61 @@ Subtotal: ₹" . number_format((float) $invoice->subtotal, 2) . "
 Discount: ₹" . number_format((float) $invoice->discount, 2) . "
 Tax: ₹" . number_format((float) $invoice->tax, 2) . "
 
-Final Total: ₹" . number_format((float) $invoice->total, 2) . "
+Final Total: ₹" . number_format((float) $invoice->total, 2);
+
+        // Add Razorpay payment link if available
+        if ($paymentLink) {
+            $message .= "
+
+Pay Now:
+{$paymentLink}
+
+Please use the link above to complete your payment.";
+        }
+
+        $message .= "
 
 Thank you for choosing Hitek Automobiles.";
-}
 
+        return $message;
+    }
+
+    public function paymentLink(
+        JobCard $jobCard,
+        string $paymentLink
+    ): string {
+        $customerName = $jobCard->customer?->name ?? 'Customer';
+
+        $jobCardNumber = $jobCard->job_card_number
+            ?? $jobCard->id;
+
+        $invoice = $jobCard->invoices()
+            ->latest()
+            ->first();
+
+        if (!$invoice) {
+            return "Hello {$customerName},
+
+Payment details are not available for Job Card {$jobCardNumber}.
+
+Thank you,
+Hitek Automobiles";
+        }
+
+        return "Hello {$customerName},
+
+Your final bill has been approved.
+
+Job Card: {$jobCardNumber}
+
+Invoice Number: {$invoice->invoice_number}
+
+Final Total: ₹" . number_format((float) $invoice->total, 2) . "
+
+Please use the payment link below to complete your payment:
+
+{$paymentLink}
+
+Thank you for choosing Hitek Automobiles.";
+    }
 }

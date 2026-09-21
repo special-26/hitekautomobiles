@@ -207,6 +207,12 @@ class JobCardInvoiceController extends Controller
                     'discount' => $discount,
                     'tax' => $tax,
                     'total' => $total,
+
+                    // Bill has been updated.
+                    // Customer approval is required again.
+                    'approval_status' => 'pending',
+                    'approved_at' => null,
+                    'approved_by' => null,
                 ]);
 
                 $invoice->items()->delete();

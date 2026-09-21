@@ -438,6 +438,20 @@ Route::middleware('auth:sanctum')
                 '/{jobCard}/invoice/generate',
                 [JobCardInvoiceController::class, 'generate']
             );
+
+            // Generate Payment Link
+            Route::post(
+                '/{jobCard}/payment-link',
+                [JobCardController::class, 'generatePaymentLink']
+            );
+            Route::post(
+                '/{jobCard}/invoice/approve',
+                [JobCardController::class, 'approveInvoice']
+            );
+            Route::post(
+                '/{jobCard}/payment-link/whatsapp',
+                [JobCardController::class, 'whatsappPaymentLink']
+            );
         });
 
         /*

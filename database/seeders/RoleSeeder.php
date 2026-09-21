@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class RoleSeeder extends Seeder
 {
@@ -200,6 +201,12 @@ class RoleSeeder extends Seeder
             'service-task-parts.create',
             'service-task-parts.remove',
 
+            // Vehicle & Parts Catalog
+            'catalog.view',
+            'catalog.create',
+            'catalog.update',
+            'catalog.status.update',
+
         ]);
 
         // Advisor
@@ -243,6 +250,7 @@ class RoleSeeder extends Seeder
             'job-cards.estimate.update',
             'job-cards.final-bill.create',
             'job-cards.final-bill.update',
+
         ]);
 
         // Floor Manager
@@ -292,6 +300,12 @@ class RoleSeeder extends Seeder
 
             // Job Card Parts
             'job-card-parts.view',
+
+            // Vehicle & Parts Catalog
+            'catalog.view',
+            'catalog.create',
+            'catalog.update',
+            'catalog.status.update',
         ]);
 
         // General Store Manager
@@ -396,11 +410,12 @@ class RoleSeeder extends Seeder
                 'email' => 'admin@hitekautomobiles.com',
             ],
             [
-                'name' => 'Hitek Admin',
-                'password' => 'password',
+                'name' => 'Admin',
+                'password' => Hash::make('password'),
                 'is_active' => true,
             ]
         );
+        $AdminUser->assignRole('Admin');
 
         $superAdminUser->syncRoles([$superAdmin]);
         $AdminUser->syncRoles([$admin]);

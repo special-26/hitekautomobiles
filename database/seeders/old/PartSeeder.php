@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Part;
-use App\Models\PartCategory;
 use Illuminate\Database\Seeder;
 
 class PartSeeder extends Seeder
@@ -2353,41 +2352,11 @@ class PartSeeder extends Seeder
             ],
         ];
 
-        foreach ($parts as $partData) {
-            $category = PartCategory::where(
-                'name',
-                $partData['category']
-            )->first();
-
-            if (!$category) {
-                $this->command?->warn(
-                    "Category not found: {$partData['category']}"
-                );
-
-                continue;
-            }
-
+        foreach ($parts as $part) {
             Part::updateOrCreate(
-                [
-                    'part_number' => $partData['part_number'],
-                ],
-                [
-                    'name' => $partData['name'],
-                    'part_category_id' => $category->id,
-                    'category' => $partData['category'],
-                    'brand' => $partData['brand'],
-                    'unit' => $partData['unit'],
-                    'cost_price' => $partData['cost_price'],
-                    'selling_price' => $partData['selling_price'],
-                    'current_stock' => $partData['current_stock'],
-                    'minimum_stock' => $partData['minimum_stock'],
-                    'is_active' => true,
-                ]
+                ['part_number' => $part['part_number']],
+                $part
             );
         }
-
-        $this->command?->info(
-            'Parts seeded successfully.'
-        );
     }
 }

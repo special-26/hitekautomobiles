@@ -19,6 +19,7 @@ class Part extends Model
     protected $fillable = [
         'part_number',
         'name',
+        'part_category_id',
         'category',
         'brand',
         'unit',
@@ -74,5 +75,13 @@ class Part extends Model
             'default_quantity',
             'is_required',
         ])->withTimestamps();
+    }
+
+    public function partCategory(): BelongsTo
+    {
+        return $this->belongsTo(
+            PartCategory::class,
+            'part_category_id'
+        );
     }
 }

@@ -86,12 +86,6 @@ class PermissionSeeder extends Seeder
             'bays.update',
             'bays.status.update',
 
-            // Service Status
-
-
-            // Inventory
-
-
             // Auto Parts Inventory
             'parts.view',
             'parts.create',
@@ -137,6 +131,14 @@ class PermissionSeeder extends Seeder
             'roles.view',
             'roles.create',
             'roles.update',
+
+            // Vehicle & Parts Catalog Management
+            'catalog.view',
+            'catalog.create',
+            'catalog.update',
+            'catalog.status.update',
+
+
 
         ];
 

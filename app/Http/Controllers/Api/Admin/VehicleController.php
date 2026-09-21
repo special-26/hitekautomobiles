@@ -387,13 +387,13 @@ class VehicleController extends Controller
                 }
             )
             ->orderBy('name')
-            ->get()
-            ->map(function ($part) use ($assignedPartIds) {
-                $part->is_assigned = $assignedPartIds
-                    ->contains($part->id);
+            ->paginate(25);
+        // ->map(function ($part) use ($assignedPartIds) {
+        //     $part->is_assigned = $assignedPartIds
+        //         ->contains($part->id);
 
-                return $part;
-            });
+        //     return $part;
+        // });
 
         return ApiResponse::success(
             $parts,
