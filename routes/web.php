@@ -1,9 +1,14 @@
 <?php
 
+use App\Livewire\Dashboard\Index as DashboardIndex;
+use App\Livewire\JobCards\CustomerVehicle;
+use App\Livewire\JobCards\Index as JobCardIndex;
+use App\Livewire\JobCards\Show as JobCardShow;
+use App\Livewire\JobCards\Tasks;
+use App\Livewire\ServiceSlotBooking;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
-use App\Livewire\ServiceSlotBooking;
 
 Route::get('/', function () {
     return view('home');
@@ -26,10 +31,27 @@ Route::get('/doca/bodyshop-cliam-docs', function () {
     return view('bodyshop-claim-docs');
 })->name('bodyshop-claim-docs');
 
-
-Route::view('dashboard', 'dashboard')
+// Dashboard
+Route::get('/dashboard', DashboardIndex::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+// Job-Card
+Route::get('/job-cards', JobCardIndex::class)
+    ->middleware(['auth'])
+    ->name('job-cards.index');
+Route::get('/job-cards/{jobCard}', JobCardShow::class)
+    ->middleware(['auth'])
+    ->name('job-cards.show');
+Route::get('/job-cards/{jobCard}/customer-vehicle', CustomerVehicle::class)
+    ->middleware(['auth'])
+    ->name('job-cards.customer-vehicle');
+Route::get('/job-cards/{jobCard}/tasks', Tasks::class)
+    ->middleware(['auth'])
+    ->name('job-cards.tasks');
+
+
+
 // Customer Business Profile
 Volt::route(
     'customer/profile',
