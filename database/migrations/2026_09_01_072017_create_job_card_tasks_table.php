@@ -17,6 +17,11 @@ return new class extends Migration
                 ->constrained('job_cards')
                 ->cascadeOnDelete();
 
+            $table->foreignId('service_task_id')
+                ->nullable()
+                ->constrained('service_tasks')
+                ->nullOnDelete();
+
             $table->foreignId('department_id')
                 ->constrained('departments')
                 ->restrictOnDelete();
@@ -63,6 +68,7 @@ return new class extends Migration
             $table->index('department_id');
             $table->index('assigned_to');
             $table->index('status');
+            $table->index('service_task_id');
         });
     }
 

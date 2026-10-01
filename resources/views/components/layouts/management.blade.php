@@ -5,12 +5,13 @@
     @include('partials.head')
 
     @livewireStyles
+    @fluxAppearance
 </head>
 
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
 
     <div class="min-h-screen">
-
+        
         {{-- Sidebar --}}
         <x-hitek.sidebar />
 
@@ -114,7 +115,56 @@
 
     </div>
 
+    <!-- Put this right before your closing </body> tag. No PHP or sessions allowed here! -->
+    <div x-data="{ 
+            show: false, 
+            type: 'info', 
+            heading: '', 
+            text: '',
+            styles: {
+                success: { icon: '✓', color: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' },
+                danger:  { icon: '✕', color: 'text-rose-500 bg-rose-500/10 border-rose-500/20' },
+                info:    { icon: '⚡', color: 'text-zinc-400 bg-zinc-800/50 border-zinc-700/50' }
+            }
+        }"
+        x-on:notify.window="
+            type = $event.detail.type || 'info';
+            heading = $event.detail.heading || '';
+            text = $event.detail.text || '';
+            show = true;
+            setTimeout(() => show = false, 4000);
+        "
+        x-show="show"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 translate-y-2 sm:translate-y-0 sm:translate-x-2"
+        x-transition:enter-end="opacity-100 translate-y-0 sm:translate-x-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        style="display: none;"
+        class="fixed bottom-5 right-5 z-50 flex max-w-sm w-full gap-3 bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-xl shadow-black/40 backdrop-blur-md">
+        
+        <!-- Dynamic Icon Badge -->
+        <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border text-xs font-bold font-mono"
+            :class="styles[type]?.color">
+            <span x-text="styles[type]?.icon"></span>
+        </div>
+        
+        <!-- Text Content -->
+        <div class="flex-1 pt-0.5">
+            <h3 x-show="heading" class="text-sm font-medium text-white leading-5" x-text="heading"></h3>
+            <p class="text-sm text-zinc-400 leading-5" :class="heading ? 'mt-1' : ''" x-text="text"></p>
+        </div>
+        
+        <!-- Dismiss Button -->
+        <button @click="show = false" class="h-5 w-5 shrink-0 flex items-center justify-center rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition">
+            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+    </div>
+
+
     @livewireScripts
+    @fluxScripts
 
 </body>
 

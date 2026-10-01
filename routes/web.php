@@ -1,8 +1,15 @@
 <?php
 
 use App\Livewire\Dashboard\Index as DashboardIndex;
+use App\Livewire\JobCards\Billing;
+use App\Livewire\JobCards\Create as NewJobCard;
 use App\Livewire\JobCards\CustomerVehicle;
+use App\Livewire\JobCards\History;
+use App\Livewire\JobCards\Images;
 use App\Livewire\JobCards\Index as JobCardIndex;
+use App\Livewire\JobCards\Insurance;
+use App\Livewire\JobCards\Parts;
+use App\Livewire\JobCards\Payments;
 use App\Livewire\JobCards\Show as JobCardShow;
 use App\Livewire\JobCards\Tasks;
 use App\Livewire\ServiceSlotBooking;
@@ -37,19 +44,30 @@ Route::get('/dashboard', DashboardIndex::class)
     ->name('dashboard');
 
 // Job-Card
-Route::get('/job-cards', JobCardIndex::class)
-    ->middleware(['auth'])
-    ->name('job-cards.index');
-Route::get('/job-cards/{jobCard}', JobCardShow::class)
-    ->middleware(['auth'])
-    ->name('job-cards.show');
-Route::get('/job-cards/{jobCard}/customer-vehicle', CustomerVehicle::class)
-    ->middleware(['auth'])
-    ->name('job-cards.customer-vehicle');
-Route::get('/job-cards/{jobCard}/tasks', Tasks::class)
-    ->middleware(['auth'])
-    ->name('job-cards.tasks');
-
+Route::prefix('job-cards')->middleware(['auth'])->group(function () {
+    Route::get('create', NewJobCard::class)
+        ->name('job-cards.create');
+    Route::get('/', JobCardIndex::class)
+        ->name('job-cards.index');
+    Route::get('{jobCard}', JobCardShow::class)
+        ->name('job-cards.show');
+    Route::get('{jobCard}/customer-vehicle', CustomerVehicle::class)
+        ->name('job-cards.customer-vehicle');
+    Route::get('{jobCard}/tasks', Tasks::class)
+        ->name('job-cards.tasks');
+    Route::get('{jobCard}/parts', Parts::class)
+        ->name('job-cards.parts');
+    Route::get('{jobCard}/images', Images::class)
+        ->name('job-cards.images');
+    Route::get('{jobCard}/insurance', Insurance::class)
+        ->name('job-cards.insurance');
+    Route::get('{jobCard}/billing', Billing::class)
+        ->name('job-cards.billing');
+    Route::get('{jobCard}/payments', Payments::class)
+        ->name('job-cards.payments');
+    Route::get('{jobCard}/history', History::class)
+        ->name('job-cards.history');
+});
 
 
 // Customer Business Profile

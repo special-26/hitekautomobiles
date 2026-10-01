@@ -13,8 +13,8 @@
             </p>
         </div>
 
-        <button
-            type="button"
+        <a
+            href="{{ route('job-cards.create') }}"
             class="inline-flex items-center justify-center gap-2 rounded-lg bg-hitek-red px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-hitek-red-hover"
         >
             <svg
@@ -32,7 +32,7 @@
             </svg>
 
             New Job Card
-        </button>
+        </a>
 
     </div>
 
@@ -41,7 +41,7 @@
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
 
         {{-- Total --}}
-        <div class="rounded-xl border border-slate-300 bg-white p-4">
+        <div class="rounded-xl border border-slate-200 bg-white p-4">
 
             <div class="flex items-center justify-between">
 
@@ -70,7 +70,7 @@
 
 
         {{-- Under Service --}}
-        <div class="rounded-xl border border-slate-300 bg-white p-4">
+        <div class="rounded-xl border border-slate-200 bg-white p-4">
 
             <div class="flex items-center justify-between">
 
@@ -94,7 +94,7 @@
 
 
         {{-- Ready --}}
-        <div class="rounded-xl border border-slate-300 bg-white p-4">
+        <div class="rounded-xl border border-slate-200 bg-white p-4">
 
             <div class="flex items-center justify-between">
 
@@ -118,7 +118,7 @@
 
 
         {{-- Payment --}}
-        <div class="rounded-xl border border-slate-300 bg-white p-4">
+        <div class="rounded-xl border border-slate-200 bg-white p-4">
 
             <div class="flex items-center justify-between">
 
@@ -142,7 +142,7 @@
 
 
         {{-- Completed --}}
-        <div class="rounded-xl border border-slate-300 bg-white p-4">
+        <div class="rounded-xl border border-slate-200 bg-white p-4">
 
             <div class="flex items-center justify-between">
 
@@ -168,10 +168,10 @@
 
 
     {{-- Job Card Table --}}
-    <div class="overflow-hidden rounded-xl border border-slate-300 bg-white">
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
 
         {{-- Toolbar --}}
-        <div class="border-b border-slate-300 p-4">
+        <div class="border-b border-slate-200 p-4">
 
             <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
 
@@ -195,7 +195,7 @@
                     <input
                         type="text"
                         placeholder="Search job card, vehicle or customer..."
-                        class="w-full rounded-lg border border-slate-300 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
+                        class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
                     >
 
                 </div>
@@ -206,7 +206,7 @@
 
                     <button
                         type="button"
-                        class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                        class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
                     >
                         Status
 
@@ -218,7 +218,7 @@
 
                     <button
                         type="button"
-                        class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                        class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
                     >
                         Advisor
 
@@ -230,7 +230,7 @@
 
                     <button
                         type="button"
-                        class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                        class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
                     >
                         Date
 
@@ -251,7 +251,7 @@
 
             <table class="w-full min-w-[1000px] text-left">
 
-                <thead class="border-b border-slate-300 bg-slate-50">
+                <thead class="border-b border-slate-200 bg-slate-50">
 
                     <tr class="text-xs uppercase tracking-wider text-slate-500">
 
@@ -368,7 +368,7 @@
 
                             <a
                                 href="{{ route('job-cards.show', 13887) }}"
-                                class="inline-flex items-center rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                                class="inline-flex items-center rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                             >
                                 View
                             </a>
@@ -455,7 +455,7 @@
 
                             <button
                                 type="button"
-                                class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                                class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                             >
                                 View
                             </button>
@@ -542,7 +542,7 @@
 
                             <button
                                 type="button"
-                                class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                                class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                             >
                                 View
                             </button>
@@ -629,7 +629,7 @@
 
                             <button
                                 type="button"
-                                class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                                class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                             >
                                 View
                             </button>
@@ -646,7 +646,7 @@
 
 
         {{-- Pagination --}}
-        <div class="flex flex-col gap-3 border-t border-slate-300 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-3 border-t border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
 
             <p class="text-xs text-slate-500">
                 Showing <span class="font-medium text-slate-700">1</span>
@@ -659,7 +659,7 @@
 
                 <button
                     type="button"
-                    class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-400"
+                    class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-400"
                     disabled
                 >
                     Previous
@@ -674,21 +674,21 @@
 
                 <button
                     type="button"
-                    class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50"
+                    class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50"
                 >
                     2
                 </button>
 
                 <button
                     type="button"
-                    class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50"
+                    class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50"
                 >
                     3
                 </button>
 
                 <button
                     type="button"
-                    class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50"
+                    class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50"
                 >
                     Next
                 </button>

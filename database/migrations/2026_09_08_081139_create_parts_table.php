@@ -18,7 +18,13 @@ return new class extends Migration
             $table->string('name');
 
             $table->string('category')->nullable();
+            $table->foreignId('part_category_id')
+                ->nullable()
+                ->constrained('part_categories')
+                ->nullOnDelete();
+
             $table->string('brand')->nullable();
+            $table->string('image')->nullable();
 
             $table->string('unit')->default('pcs');
 

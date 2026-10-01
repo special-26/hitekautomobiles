@@ -18,9 +18,9 @@
 
 
     {{-- Job Card Header --}}
-    <div class="overflow-hidden rounded-xl border border-slate-300 bg-white">
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
 
-        <div class="border-b border-slate-300 p-6">
+        <div class="border-b border-slate-200 p-6">
 
             <div class="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
 
@@ -70,14 +70,14 @@
 
                     <button
                         type="button"
-                        class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                        class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
                     >
                         Edit
                     </button>
 
                     <button
                         type="button"
-                        class="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                        class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
                     >
                         Print
                     </button>
@@ -133,69 +133,10 @@
 
 
     {{-- Navigation --}}
-    <div class="overflow-x-auto border-b border-slate-300">
-
-        <nav class="flex min-w-max gap-6">
-
-            <a
-                href="#"
-                class="border-b-2 border-hitek-red px-1 pb-3 text-sm font-semibold text-hitek-red"
-            >
-                Overview
-            </a>
-
-            <a
-                href="{{ route('job-cards.tasks', $jobCard['id']) }}"
-                class="border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-slate-500 hover:text-slate-900"
-            >
-                Tasks
-            </a>
-
-            <a
-                href="#"
-                class="border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-slate-500 hover:text-slate-900"
-            >
-                Parts
-            </a>
-
-            <a
-                href="#"
-                class="border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-slate-500 hover:text-slate-900"
-            >
-                Images
-            </a>
-
-            <a
-                href="#"
-                class="border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-slate-500 hover:text-slate-900"
-            >
-                Insurance
-            </a>
-
-            <a
-                href="#"
-                class="border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-slate-500 hover:text-slate-900"
-            >
-                Billing
-            </a>
-
-            <a
-                href="#"
-                class="border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-slate-500 hover:text-slate-900"
-            >
-                Payments
-            </a>
-
-            <a
-                href="#"
-                class="border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-slate-500 hover:text-slate-900"
-            >
-                History
-            </a>
-
-        </nav>
-
-    </div>
+    <x-hitek.job-card-navigation
+        :job-card-id="$jobCard['id']"
+        active="overview"
+    />
 
 
     {{-- Main Grid --}}
@@ -203,9 +144,9 @@
 
 
         {{-- Customer --}}
-        <div class="rounded-xl border border-slate-300 bg-white">
+        <div class="rounded-xl border border-slate-200 bg-white">
 
-            <div class="border-b border-slate-300 px-5 py-4">
+            <div class="border-b border-slate-200 px-5 py-4">
 
                 <div class="flex items-center justify-between">
 
@@ -259,9 +200,9 @@
 
 
         {{-- Vehicle --}}
-        <div class="rounded-xl border border-slate-300 bg-white">
+        <div class="rounded-xl border border-slate-200 bg-white">
 
-            <div class="border-b border-slate-300 px-5 py-4">
+            <div class="border-b border-slate-200 px-5 py-4">
 
                 <div class="flex items-center justify-between">
 
@@ -315,9 +256,9 @@
 
 
         {{-- Insurance --}}
-        <div class="rounded-xl border border-slate-300 bg-white">
+        <div class="rounded-xl border border-slate-200 bg-white">
 
-            <div class="border-b border-slate-300 px-5 py-4">
+            <div class="border-b border-slate-200 px-5 py-4">
 
                 <div class="flex items-center justify-between">
 
@@ -373,9 +314,9 @@
 
 
     {{-- Financial Summary --}}
-    <div class="rounded-xl border border-slate-300 bg-white">
+    <div class="rounded-xl border border-slate-200 bg-white">
 
-        <div class="border-b border-slate-300 px-5 py-4">
+        <div class="border-b border-slate-200 px-5 py-4">
 
             <h3 class="text-sm font-semibold text-slate-900">
                 Financial Summary
@@ -427,9 +368,9 @@
 
 
     {{-- Service Timeline --}}
-    <div class="rounded-xl border border-slate-300 bg-white">
+    <div class="rounded-xl border border-slate-200 bg-white">
 
-        <div class="border-b border-slate-300 px-5 py-4">
+        <div class="border-b border-slate-200 px-5 py-4">
 
             <h3 class="text-sm font-semibold text-slate-900">
                 Service Timeline

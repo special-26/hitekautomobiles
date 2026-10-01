@@ -55,48 +55,10 @@
 
 
     {{-- Job Card Navigation --}}
-    <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-        <div class="flex min-w-max items-center px-2">
-            <a
-                href="{{ route('job-cards.show', $jobCard['id']) }}"
-                class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900"
-            >
-                Overview
-            </a>
-
-            <div class="border-b-2 border-hitek-red px-4 py-3 text-sm font-semibold text-hitek-red">
-                Customer & Vehicle
-            </div>
-
-            <button class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900">
-                Tasks
-            </button>
-
-            <button class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900">
-                Parts
-            </button>
-
-            <button class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900">
-                Images
-            </button>
-
-            <button class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900">
-                Insurance
-            </button>
-
-            <button class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900">
-                Billing
-            </button>
-
-            <button class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900">
-                Payments
-            </button>
-
-            <button class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900">
-                History
-            </button>
-        </div>
-    </div>
+    <x-hitek.job-card-navigation
+        :job-card-id="$jobCard['id']"
+        active="customer-vehicle"
+    />
 
 
     {{-- Customer + Vehicle --}}
