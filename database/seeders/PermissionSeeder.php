@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Permission;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class PermissionSeeder extends Seeder
@@ -15,78 +14,205 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
 
-            // Owner / Super Admin
+            /*
+            |--------------------------------------------------------------------------
+            | Dashboard
+            |--------------------------------------------------------------------------
+            */
+
+            'dashboard.view',
+
+            /*
+            |--------------------------------------------------------------------------
+            | Super Admin / Owner
+            |--------------------------------------------------------------------------
+            */
+
             'owner.dashboard.view',
             'owner.statistics.view',
             'owner.reports.view',
             'owner.activity.view',
-            'owner.admins.manage',
 
-            // Dashboard
-            'dashboard.view',
+            /*
+            |--------------------------------------------------------------------------
+            | Admin User Management
+            |--------------------------------------------------------------------------
+            */
 
-            // Users
+            'admin-users.view',
+            'admin-users.create',
+            'admin-users.status.update',
 
+            /*
+            |--------------------------------------------------------------------------
+            | Customers
+            |--------------------------------------------------------------------------
+            */
 
-            // Customers
             'customers.view',
             'customers.create',
             'customers.update',
             'customers.status.update',
 
-            // Vehicles
+            /*
+            |--------------------------------------------------------------------------
+            | Vehicles
+            |--------------------------------------------------------------------------
+            */
+
             'vehicles.view',
             'vehicles.create',
             'vehicles.update',
             'vehicles.status.update',
 
-            // Job Cards
+            /*
+            |--------------------------------------------------------------------------
+            | Job Cards
+            |--------------------------------------------------------------------------
+            */
+
             'job-cards.view',
             'job-cards.create',
             'job-cards.update',
             'job-cards.status.update',
 
-            // Job Card Tasks
+            /*
+            |--------------------------------------------------------------------------
+            | Job Card Tasks
+            |--------------------------------------------------------------------------
+            */
+
             'job-cards-tasks.view',
             'job-cards-tasks.create',
             'job-cards-tasks.update',
             'job-cards-tasks.status.update',
 
-            // Mechanic Coordinator - Task Execution
+            /*
+            |--------------------------------------------------------------------------
+            | Mechanic Coordinator - Task Execution
+            |--------------------------------------------------------------------------
+            |
+            | Used by Nuxt Mechanic Coordinator.
+            |
+            */
+
             'job-cards-tasks.assign-mechanic',
             'job-cards-tasks.assign-bay',
 
-            // Service Task Catalog - Admin
+            /*
+            |--------------------------------------------------------------------------
+            | Service Task Catalog
+            |--------------------------------------------------------------------------
+            */
+
             'service-tasks.view',
             'service-tasks.create',
             'service-tasks.update',
             'service-tasks.status.update',
 
-            // Service Task Suggested Parts
+            /*
+            |--------------------------------------------------------------------------
+            | Service Task Suggested Parts
+            |--------------------------------------------------------------------------
+            */
+
             'service-task-parts.view',
             'service-task-parts.create',
             'service-task-parts.remove',
 
-            // Job Card Parts
+            /*
+            |--------------------------------------------------------------------------
+            | Job Card Parts
+            |--------------------------------------------------------------------------
+            |
+            | Used by Nuxt Mechanic Coordinator / Store Manager workflows.
+            |
+            */
+
             'job-card-parts.view',
             'job-card-parts.request',
             'job-card-parts.create',
             'job-card-parts.update',
             'job-card-parts.remove',
 
-            // Billing
+            /*
+            |--------------------------------------------------------------------------
+            | Job Card Billing
+            |--------------------------------------------------------------------------
+            |
+            | Billing for an individual Job Card.
+            |
+            */
+
+            'job-cards.estimate.view',
             'job-cards.estimate.create',
             'job-cards.estimate.update',
+
+            'job-cards.final-bill.view',
             'job-cards.final-bill.create',
             'job-cards.final-bill.update',
 
-            // Bays
+            /*
+            |--------------------------------------------------------------------------
+            | Payments
+            |--------------------------------------------------------------------------
+            |
+            | Payments connected with Job Cards / Customers.
+            |
+            */
+
+            'payments.view',
+            'payments.create',
+            'payments.update',
+
+            /*
+            |--------------------------------------------------------------------------
+            | Finance
+            |--------------------------------------------------------------------------
+            |
+            | Global financial management.
+            |
+            */
+
+            'finance.view',
+            'finance.manage',
+
+            /*
+            |--------------------------------------------------------------------------
+            | Finance Reports
+            |--------------------------------------------------------------------------
+            */
+
+            'finance.reports.view',
+
+            /*
+            |--------------------------------------------------------------------------
+            | Reports
+            |--------------------------------------------------------------------------
+            */
+
+            'reports.view',
+
+            /*
+            |--------------------------------------------------------------------------
+            | Bays
+            |--------------------------------------------------------------------------
+            */
+
             'bays.view',
             'bays.create',
             'bays.update',
             'bays.status.update',
 
-            // Auto Parts Inventory
+            /*
+            |--------------------------------------------------------------------------
+            | Auto Parts Inventory
+            |--------------------------------------------------------------------------
+            |
+            | Mainly used by Nuxt Auto Parts Store Manager.
+            |
+            */
+
             'parts.view',
             'parts.create',
             'parts.update',
@@ -98,7 +224,12 @@ class PermissionSeeder extends Seeder
             'parts.adjust',
             'parts.suppliers.manage',
 
-            // General Inventory
+            /*
+            |--------------------------------------------------------------------------
+            | General Inventory
+            |--------------------------------------------------------------------------
+            */
+
             'inventory.view',
             'inventory.manage',
             'inventory.receive',
@@ -106,40 +237,105 @@ class PermissionSeeder extends Seeder
             'inventory.return',
             'inventory.adjust',
 
-            // Payments
+            /*
+            |--------------------------------------------------------------------------
+            | Bookings
+            |--------------------------------------------------------------------------
+            */
 
+            'bookings.view',
+            'bookings.create',
+            'bookings.update',
+            'bookings.status.update',
 
-            // Reports
+            /*
+            |--------------------------------------------------------------------------
+            | Employee Management
+            |--------------------------------------------------------------------------
+            */
 
-
-            // Bookings
-
-
-            // Employee Management
             'employees.view',
             'employees.create',
             'employees.update',
             'employees.status.update',
 
-            // Department Management
+            // Bank account
+            'employees.bank-details.manage',
+            'employees.salary.manage',
+
+            // Attendance
+            'attendance.view',
+            'attendance.manage',
+            'attendance.check-in',
+            'attendance.check-out',
+
+            // Shifts
+            'shifts.view',
+            'shifts.manage',
+
+            'payroll.settings.manage',
+            'payroll.view',
+            'payroll.calculate',
+            'payroll.approve',
+            'payroll.payment.manage',
+
+            'company-holidays.view',
+            'company-holidays.manage',
+
+            'leave-requests.view',
+            'leave-requests.review',
+
+            'marketing-studio.view',
+
+            /*
+            |--------------------------------------------------------------------------
+            | Department Management
+            |--------------------------------------------------------------------------
+            */
+
             'departments.view',
             'departments.create',
             'departments.update',
             'departments.status.update',
 
-            // Role Management
+            /*
+            |--------------------------------------------------------------------------
+            | Role Management
+            |--------------------------------------------------------------------------
+            */
+
             'roles.view',
             'roles.create',
             'roles.update',
 
-            // Vehicle & Parts Catalog Management
+            /*
+            |--------------------------------------------------------------------------
+            | Payroll
+            |--------------------------------------------------------------------------
+            */
+
+            'payroll.view',
+            'payroll.manage',
+
+            /*
+            |--------------------------------------------------------------------------
+            | Settings
+            |--------------------------------------------------------------------------
+            */
+
+            'settings.view',
+            'settings.update',
+
+            /*
+            |--------------------------------------------------------------------------
+            | Vehicle & Parts Catalog
+            |--------------------------------------------------------------------------
+            */
+
             'catalog.view',
             'catalog.create',
             'catalog.update',
             'catalog.status.update',
-
-
-
         ];
 
         foreach ($permissions as $permission) {

@@ -21,12 +21,17 @@ return new class extends Migration
 
             $table->string('description');
 
-            $table->decimal('quantity', 10, 2)->default(1);
-
-            $table->decimal('unit_price', 12, 2)->default(0);
-
+            $table->string('hsn_sac', 30)->nullable();
             $table->decimal('discount', 12, 2)->default(0);
-
+            $table->decimal('taxable_amount', 12, 2)->default(0);
+            $table->decimal('cgst_rate', 5, 2)->default(0);
+            $table->decimal('cgst_amount', 12, 2)->default(0);
+            $table->decimal('sgst_rate', 5, 2)->default(0);
+            $table->decimal('sgst_amount', 12, 2)->default(0);
+            $table->decimal('igst_rate', 5, 2)->default(0);
+            $table->decimal('igst_amount', 12, 2)->default(0);
+            $table->decimal('quantity', 10, 2)->default(1);
+            $table->decimal('unit_price', 12, 2)->default(0);
             $table->decimal('total', 12, 2)->default(0);
 
             $table->timestamps();

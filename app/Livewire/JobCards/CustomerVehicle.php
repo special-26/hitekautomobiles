@@ -2,6 +2,7 @@
 
 namespace App\Livewire\JobCards;
 
+use App\Models\JobCard;
 use Livewire\Component;
 
 class CustomerVehicle extends Component
@@ -10,31 +11,50 @@ class CustomerVehicle extends Component
 
     public function mount($jobCard)
     {
+        $this->loadJobCard($jobCard);
+    }
+
+    protected function loadJobCard($jobCardId): void
+    {
+        $jobCard = JobCard::query()
+            ->with([
+                'customer',
+                'vehicle',
+            ])
+            ->findOrFail($jobCardId);
+
+        $customer = $jobCard->customer;
+        $vehicle = $jobCard->vehicle;
+
         $this->jobCard = [
-            'id' => $jobCard,
+            'id' => $jobCard->id,
+            'job_card_number' => $jobCard->job_card_number,
 
             // Customer
-            'customer_name' => 'Mrs. Indu Narula',
-            'mobile' => '9256681776',
-            'email' => 'indu.narula@example.com',
-            'address' => 'Sector 17, Chandigarh',
-            'customer_source' => 'National Insurance Co. Ltd.',
+            'customer_name' => $customer->name,
+            'mobile' => $customer->phone,
+            'email' => $customer->email,
+            'address' => $customer->address,
+            'customer_source' => $jobCard->customer_source,
 
             // Vehicle
-            'vehicle' => 'Hyundai Creta 1.6',
-            'vehicle_no' => 'CH01BT9020',
-            'km' => '138,884',
-            'fuel' => 'Petrol',
-            'year' => '2021',
-            'colour' => 'White',
+            'vehicle' => trim(
+                $vehicle->make . ' ' . $vehicle->model
+                    . ($vehicle->variant ? ' ' . $vehicle->variant : '')
+            ),
+            'vehicle_no' => $vehicle->registration_number,
+            'km' => $vehicle->current_odometer,
+            'fuel' => $vehicle->fuel_type,
+            'year' => $vehicle->manufacturing_year,
+            'colour' => $vehicle->color,
 
-            // RC
-            'owner_name' => 'Indu Narula',
-            'chassis_no' => 'MALC381CLMM123456',
-            'engine_no' => 'G4FJMN123456',
-            'registration_date' => '15 Mar 2021',
-            'rto' => 'Chandigarh',
-            'fuel_type' => 'Petrol',
+            // RC / Vehicle Details
+            'owner_name' => $customer->name,
+            'chassis_no' => $vehicle->vin,
+            'engine_no' => $vehicle->engine_number,
+            'registration_date' => null,
+            'rto' => null,
+            'fuel_type' => $vehicle->fuel_type,
         ];
     }
 
@@ -42,7 +62,7 @@ class CustomerVehicle extends Component
     {
         return view('livewire.job-cards.customer-vehicle')
             ->layout('components.layouts.management', [
-                'title' => 'Job Card #' . $this->jobCard['id'],
+                'title' => 'Job Card #' . $this->jobCard['job_card_number'],
             ]);
     }
 }

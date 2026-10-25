@@ -30,10 +30,12 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
             AdminCreateSeeder::class,
+            VehicleBrandSeeder::class,
+            VehicleModelSeeder::class,
             PartCategorySeeder::class,
-            AssignPartCategoriesSeeder::class,
             PartSeeder::class,
-            VehicleCatalogSeeder::class,
+            ModelPartSeeder::class,
+            JobCardImageSeeder::class,
         ]);
     }
 }

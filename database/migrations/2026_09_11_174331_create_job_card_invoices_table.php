@@ -24,6 +24,9 @@ return new class extends Migration
             $table->decimal('tax', 12, 2)->default(0);
             $table->decimal('total', 12, 2)->default(0);
 
+            $table->string('tax_type', 20)->default('SGST/UGST');
+            $table->decimal('tax_rate', 5, 2)->default(0);
+
             $table->string('status')->default('draft');
 
             $table->string('approval_status')->default('pending');
@@ -36,6 +39,7 @@ return new class extends Migration
 
             $table->string('razorpay_payment_link_id')->nullable();
             $table->text('razorpay_payment_link_url')->nullable();
+            $table->decimal('razorpay_payment_link_amount', 12, 2)->nullable();
             $table->string('razorpay_payment_status')->nullable();
             $table->timestamp('razorpay_payment_link_created_at')->nullable();
             $table->timestamp('razorpay_paid_at')->nullable();

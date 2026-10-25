@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\JobCardInvoiceItem;
 use App\Models\JobCardInvoiceShareActivity;
+use App\Models\JobCardPayment;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +18,8 @@ class JobCardInvoice extends Model
         'subtotal',
         'discount',
         'tax',
+        'tax_type',
+        'tax_rate',
         'total',
         'status',
         'created_by',
@@ -28,6 +31,7 @@ class JobCardInvoice extends Model
         // Razorpay payment fields
         'razorpay_payment_link_id',
         'razorpay_payment_link_url',
+        'razorpay_payment_link_amount',
         'razorpay_payment_status',
         'razorpay_payment_link_created_at',
         'razorpay_paid_at',
@@ -37,11 +41,13 @@ class JobCardInvoice extends Model
         'subtotal' => 'decimal:2',
         'discount' => 'decimal:2',
         'tax' => 'decimal:2',
+        'tax_rate' => 'decimal:2',
         'total' => 'decimal:2',
 
         'approved_at' => 'datetime',
 
         'razorpay_payment_link_created_at' => 'datetime',
+        'razorpay_payment_link_amount' => 'decimal:2',
         'razorpay_paid_at' => 'datetime',
     ];
 
@@ -66,5 +72,10 @@ class JobCardInvoice extends Model
             JobCardInvoiceShareActivity::class,
             'job_card_invoice_id'
         );
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(JobCardPayment::class, 'job_card_invoice_id');
     }
 }

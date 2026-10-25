@@ -3,6 +3,7 @@
 namespace App\Services\WhatsApp;
 
 use App\Models\JobCard;
+use App\Models\JobCardInvoice;
 
 class WhatsAppMessageService
 {
@@ -255,5 +256,38 @@ Please use the payment link below to complete your payment:
 {$paymentLink}
 
 Thank you for choosing Hitek Automobiles.";
+    }
+
+
+    public function invoiceCreated(JobCardInvoice $invoice): string
+    {
+        $invoice->loadMissing([
+            'jobCard.customer',
+            'jobCard.vehicle',
+        ]);
+
+        $jobCard = $invoice->jobCard;
+        $customer = $jobCard->customer;
+        $vehicle = $jobCard->vehicle;
+
+        $message = "Hello {$customer->name},\n\n";
+
+        $message .= "Your invoice from *Hitek Automobiles* is ready.\n\n";
+
+        $message .= "*Invoice Details*\n";
+        $message .= "Invoice No: {$invoice->invoice_number}\n";
+        $message .= "Job Card: {$jobCard->job_card_number}\n";
+
+        if ($vehicle) {
+            $message .= "Vehicle: {$vehicle->registration_number}\n";
+        }
+
+        $message .= "Invoice Amount: ₹" . number_format((float) $invoice->total, 2) . "\n\n";
+
+        $message .= "Thank you for choosing Hitek Automobiles.\n";
+        $message .= "Plot No. 131, Industrial Area Phase I, Chandigarh - 160002\n";
+        $message .= "Phone: 9216111868";
+
+        return $message;
     }
 }

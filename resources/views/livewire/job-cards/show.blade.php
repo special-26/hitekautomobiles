@@ -42,7 +42,7 @@
                         <div class="flex flex-wrap items-center gap-3">
 
                             <h2 class="text-xl font-bold text-slate-900">
-                                Job Card #{{ $jobCard['id'] }}
+                                Job Card #{{ $jobCard['job_card_number'] }}
                             </h2>
 
                             <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
@@ -291,9 +291,15 @@
                         Claim Status
                     </p>
 
-                    <span class="mt-1 inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
-                        In Process
-                    </span>
+                    @if($jobCard['insurance_claim_status'])
+                        <span class="mt-1 inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                            {{ $jobCard['insurance_claim_status'] }}
+                        </span>
+                    @else
+                        <p class="mt-1 text-sm font-medium text-slate-500">
+                            Not Available
+                        </p>
+                    @endif
                 </div>
 
                 <div>
@@ -302,7 +308,7 @@
                     </p>
 
                     <p class="mt-1 text-sm font-medium text-slate-900">
-                        Not Available
+                        {{ $jobCard['insurance_policy_number'] ?? 'Not Available' }}
                     </p>
                 </div>
 
@@ -333,7 +339,7 @@
                 </p>
 
                 <p class="mt-2 text-xl font-bold text-slate-900">
-                    {{ $jobCard['estimate'] }}
+                    {{ $jobCard['estimate'] ?? 'Not Available' }}
                 </p>
 
             </div>
@@ -345,7 +351,7 @@
                 </p>
 
                 <p class="mt-2 text-xl font-bold text-emerald-600">
-                    {{ $jobCard['paid'] }}
+                    {{ $jobCard['paid'] ?? 'Not Available' }}
                 </p>
 
             </div>
@@ -357,7 +363,7 @@
                 </p>
 
                 <p class="mt-2 text-xl font-bold text-hitek-red">
-                    {{ $jobCard['due'] }}
+                    {{ $jobCard['due'] ?? 'Not Available' }}
                 </p>
 
             </div>
@@ -382,6 +388,7 @@
 
             <div class="space-y-6">
 
+                {{-- Job Card Created --}}
                 <div class="flex gap-4">
 
                     <div class="relative flex w-5 justify-center">
@@ -396,13 +403,14 @@
                         </p>
 
                         <p class="mt-1 text-xs text-slate-500">
-                            23 Sep 2026 · 09:30 AM
+                            {{ $jobCard['created_at'] }}
                         </p>
                     </div>
 
                 </div>
 
 
+                {{-- Current Status --}}
                 <div class="flex gap-4">
 
                     <div class="relative flex w-5 justify-center">
@@ -412,34 +420,53 @@
                     </div>
 
                     <div>
+
                         <p class="text-sm font-semibold text-slate-900">
-                            Vehicle Under Service
+                            Current Status
                         </p>
 
                         <p class="mt-1 text-xs text-slate-500">
-                            Mechanic assigned and work started
+                            {{ $jobCard['status'] }}
                         </p>
+
                     </div>
 
                 </div>
 
 
+                {{-- Ready for Delivery --}}
                 <div class="flex gap-4">
 
                     <div class="relative flex w-5 justify-center">
 
-                        <span class="h-3 w-3 rounded-full bg-slate-300"></span>
+                        <span class="h-3 w-3 rounded-full
+                            {{ $jobCard['status'] === 'Completed'
+                                ? 'bg-emerald-500'
+                                : 'bg-slate-300' }}">
+                        </span>
 
                     </div>
 
                     <div>
-                        <p class="text-sm font-semibold text-slate-400">
+
+                        <p class="text-sm font-semibold
+                            {{ $jobCard['status'] === 'Completed'
+                                ? 'text-slate-900'
+                                : 'text-slate-400' }}">
                             Ready for Delivery
                         </p>
 
-                        <p class="mt-1 text-xs text-slate-400">
-                            Pending
+                        <p class="mt-1 text-xs
+                            {{ $jobCard['status'] === 'Completed'
+                                ? 'text-slate-500'
+                                : 'text-slate-400' }}">
+
+                            {{ $jobCard['status'] === 'Completed'
+                                ? 'Vehicle ready for delivery'
+                                : 'Pending' }}
+
                         </p>
+
                     </div>
 
                 </div>

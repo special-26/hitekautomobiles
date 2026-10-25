@@ -29,10 +29,18 @@ return new class extends Migration
             $table->string('employee_code')->unique();
 
             $table->string('phone', 20)->nullable();
+            $table->text('address')->nullable();
+            $table->string('city', 100)->nullable();
+            $table->string('state', 100)->nullable();
+            $table->string('pincode', 10)->nullable();
+            $table->string('emergency_contact_name')->nullable();
+            $table->string('emergency_contact_phone', 20)->nullable();
 
             $table->string('designation')->nullable();
 
             $table->date('joining_date')->nullable();
+            $table->date('date_of_birth')->nullable();
+            $table->string('gender', 30)->nullable();
 
             $table->string('status')->default('active');
 

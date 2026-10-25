@@ -24,6 +24,9 @@ return new class extends Migration
             $table->decimal('tax', 12, 2)->default(0);
             $table->decimal('total', 12, 2)->default(0);
 
+            $table->string('tax_type', 20)->default('SGST/UGST');
+            $table->decimal('tax_rate', 5, 2)->default(0);
+
             $table->string('status')->default('draft');
 
             $table->uuid('created_by')

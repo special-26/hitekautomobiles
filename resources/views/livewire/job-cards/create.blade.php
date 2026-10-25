@@ -221,9 +221,19 @@
 
                             </div>
 
-                            <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
-                                Selected
-                            </span>
+                            <div class="flex items-center gap-2">
+                                <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
+                                    Selected
+                                </span>
+
+                                <button
+                                    type="button"
+                                    wire:click="confirmClearCustomer"
+                                    class="rounded-lg px-2 py-1 text-xs font-semibold text-slate-400 hover:bg-red-50 hover:text-red-600"
+                                >
+                                    Change
+                                </button>
+                            </div>
 
                         </div>
 
@@ -396,9 +406,21 @@
 
                             </div>
 
-                            <span class="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700">
-                                Selected
-                            </span>
+                            <div class="flex items-center gap-2">
+
+                                <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
+                                    Selected
+                                </span>
+
+                                <button
+                                    type="button"
+                                    wire:click="clearVehicle"
+                                    class="rounded-lg px-2 py-1 text-xs font-semibold text-slate-400 hover:bg-red-50 hover:text-red-600"
+                                >
+                                    Change
+                                </button>
+
+                            </div>
 
                         </div>
 
@@ -518,10 +540,22 @@
                     wire:model="jobCard.advisor"
                     class="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
                 >
-                    <option value="Basant Joshi">Basant Joshi</option>
-                    <option value="Advisor 2">Advisor 2</option>
-                    <option value="Advisor 3">Advisor 3</option>
+                    <option value="">
+                        Select Advisor
+                    </option>
+
+                    @foreach ($advisorResults as $advisor)
+                        <option value="{{ $advisor['id'] }}">
+                            {{ $advisor['name'] }}
+                        </option>
+                    @endforeach
                 </select>
+
+                @error('jobCard.advisor_id')
+                    <p class="mt-1 text-xs text-red-600">
+                        {{ $message }}
+                    </p>
+                @enderror
             </div>
 
 
@@ -659,7 +693,6 @@
 
     </div>
 
-
     {{-- Insurance --}}
     <div class="rounded-xl border border-slate-200 bg-white">
 
@@ -796,6 +829,7 @@
 
             <button
                 type="button"
+                wire:click="openConcernModal"
                 class="rounded-lg bg-hitek-red px-3 py-1.5 text-xs font-semibold text-white hover:bg-hitek-red-hover"
             >
                 + Add Concern
@@ -804,46 +838,72 @@
         </div>
 
 
-        <div class="divide-y divide-slate-100">
+        {{-- Concerns --}}
+        @if (count($concerns) > 0)
 
-            @foreach ($concerns as $concern)
+            <div class="divide-y divide-slate-100">
 
-                <div class="flex items-start gap-4 px-5 py-4">
+                @foreach ($concerns as $index => $concern)
 
-                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-sm font-bold text-hitek-red">
-                        {{ $loop->iteration }}
-                    </div>
+                    <div class="flex items-start gap-4 px-5 py-4">
 
-                    <div class="min-w-0 flex-1">
+                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-sm font-bold text-hitek-red">
+                            {{ $loop->iteration }}
+                        </div>
 
-                        <div class="flex flex-wrap items-center gap-2">
+                        <div class="min-w-0 flex-1">
 
-                            <p class="font-medium text-slate-800">
-                                {{ $concern['description'] }}
-                            </p>
+                            <div class="flex flex-wrap items-center gap-2">
 
-                            <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-                                {{ $concern['type'] }}
-                            </span>
+                                <p class="font-medium text-slate-800">
+                                    {{ $concern['description'] }}
+                                </p>
+
+                                <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                                    {{ $concern['type'] }}
+                                </span>
+
+                            </div>
 
                         </div>
 
+                        <button
+                            type="button"
+                            wire:click="removeConcern({{ $index }})"
+                            wire:confirm="Remove this concern?"
+                            class="text-xs font-semibold text-slate-400 hover:text-red-600"
+                        >
+                            Remove
+                        </button>
+
                     </div>
 
-                    <button
-                        type="button"
-                        class="text-xs font-semibold text-slate-400 hover:text-red-600"
-                    >
-                        Remove
-                    </button>
+                @endforeach
 
+            </div>
+
+        @else
+
+            <div class="px-5 py-8 text-center">
+
+                <div class="text-2xl">
+                    📝
                 </div>
 
-            @endforeach
+                <p class="mt-2 text-sm font-medium text-slate-700">
+                    No customer concerns added
+                </p>
 
-        </div>
+                <p class="mt-1 text-xs text-slate-500">
+                    Add the customer's complaints, requests or inspection requirements.
+                </p>
+
+            </div>
+
+        @endif
 
 
+        {{-- Additional Remarks --}}
         <div class="border-t border-slate-200 bg-slate-50 px-5 py-4">
 
             <label class="text-sm font-medium text-slate-700">
@@ -852,13 +912,153 @@
 
             <textarea
                 rows="3"
+                wire:model="jobCard.remarks"
                 placeholder="Add any additional customer instructions or remarks..."
                 class="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none placeholder:text-slate-400 focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-            >{{ $jobCard['remarks'] }}</textarea>
+            ></textarea>
 
         </div>
 
     </div>
+
+
+    {{-- Add Concern Modal --}}
+    @if ($showConcernModal)
+
+        <div
+            class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
+            wire:click.self="closeConcernModal"
+        >
+
+            <div class="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl">
+
+                {{-- Header --}}
+                <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-slate-900">
+                            Add Customer Concern
+                        </h3>
+
+                        <p class="mt-1 text-xs text-slate-500">
+                            Record what the customer wants checked or repaired.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        wire:click="closeConcernModal"
+                        class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                    >
+                        ✕
+                    </button>
+
+                </div>
+
+
+                {{-- Body --}}
+                <div class="space-y-5 px-6 py-5">
+
+                    {{-- Type --}}
+                    <div>
+
+                        <label class="text-sm font-medium text-slate-700">
+                            Concern Type
+                        </label>
+
+                        <select
+                            wire:model="newConcern.type"
+                            class="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
+                        >
+                            <option value="Customer Complaint">
+                                Customer Complaint
+                            </option>
+
+                            <option value="Service">
+                                Service
+                            </option>
+
+                            <option value="Inspection">
+                                Inspection
+                            </option>
+
+                            <option value="Repair">
+                                Repair
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+                        </select>
+
+                        @error('newConcern.type')
+                            <p class="mt-1 text-xs text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
+                    </div>
+
+
+                    {{-- Description --}}
+                    <div>
+
+                        <label class="text-sm font-medium text-slate-700">
+                            Description <span class="text-hitek-red">*</span>
+                        </label>
+
+                        <textarea
+                            wire:model="newConcern.description"
+                            rows="4"
+                            placeholder="Example: Brake noise while driving..."
+                            class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-700 outline-none placeholder:text-slate-400 focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
+                        ></textarea>
+
+                        @error('newConcern.description')
+                            <p class="mt-1 text-xs text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
+                    </div>
+
+                </div>
+
+
+                {{-- Footer --}}
+                <div class="flex items-center justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4">
+
+                    <button
+                        type="button"
+                        wire:click="closeConcernModal"
+                        class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="button"
+                        wire:click="addConcern"
+                        wire:loading.attr="disabled"
+                        wire:target="addConcern"
+                        class="rounded-lg bg-hitek-red px-5 py-2 text-sm font-semibold text-white hover:bg-hitek-red-hover disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        <span wire:loading.remove wire:target="addConcern">
+                            Add Concern
+                        </span>
+
+                        <span wire:loading wire:target="addConcern">
+                            Adding...
+                        </span>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    @endif
 
 
     {{-- Bottom Actions --}}
@@ -873,18 +1073,39 @@
 
         <div class="flex flex-col gap-2 sm:flex-row">
 
+            {{-- Save Draft --}}
             <button
                 type="button"
-                class="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                wire:click="saveDraft"
+                wire:loading.attr="disabled"
+                wire:target="saveDraft"
+                class="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
             >
-                Save as Draft
+                <span wire:loading.remove wire:target="saveDraft">
+                    Save as Draft
+                </span>
+
+                <span wire:loading wire:target="saveDraft">
+                    Saving...
+                </span>
             </button>
 
+
+            {{-- Save & Continue --}}
             <button
                 type="button"
-                class="rounded-lg bg-hitek-red px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-hitek-red-hover"
+                wire:click="saveAndContinue"
+                wire:loading.attr="disabled"
+                wire:target="saveAndContinue"
+                class="rounded-lg bg-hitek-red px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-hitek-red-hover disabled:cursor-not-allowed disabled:opacity-60"
             >
-                Save & Continue to Tasks
+                <span wire:loading.remove wire:target="saveAndContinue">
+                    Save & Continue to Tasks
+                </span>
+
+                <span wire:loading wire:target="saveAndContinue">
+                    Creating...
+                </span>
             </button>
 
         </div>

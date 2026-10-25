@@ -1,83 +1,148 @@
-<nav class="bg-white fixed w-full z-20 top-0 start-0 border-b border-default">
-    <div class="max-w-screen-2xl flex flex-wrap items-center justify-between mx-auto py-4 px-3 md:px-12">
-        <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src="{{ asset('images/logo.jpg') }}" class="h-12" alt="Flowbite Logo">
+@php
+    $whatsappUrl = 'https://wa.me/919216111868?text=' . rawurlencode('Hello Hitek Automobiles, I would like to enquire about car service.');
+@endphp
+<header class="sticky top-0 z-50 border-b border-black/5 bg-white/95 backdrop-blur-xl">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8" aria-label="Main navigation">
+        <a href="{{ route('home') }}" class="group flex items-center gap-3" aria-label="Hitek Automobiles home">
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e32636] text-lg font-black italic tracking-tighter text-white">H</span>
+            <span class="leading-none"><span class="block text-lg font-black tracking-[0.12em] text-[#17191b]">HITEK</span><span class="mt-1 block text-[9px] font-bold tracking-[0.28em] text-zinc-500">AUTOMOBILES</span></span>
         </a>
-        {{-- <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-            <button type="button" class=" bg-primary box-border border border-transparent focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-lg text-sm px-3 py-2 focus:outline-none">Get started</button>
-            <button data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-body rounded-base md:hidden hover:bg-neutral-secondary-soft hover:text-heading focus:outline-none focus:ring-2 focus:ring-neutral-tertiary" aria-controls="navbar-sticky" aria-expanded="false">
-                <span class="sr-only">Open main menu</span>
-                <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 7h14M5 12h14M5 17h14"/></svg>
-            </button>
-        </div> --}}
-
-        <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
-            <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-default rounded-base md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 text-gray-800">
-                <li>
-                <a href="#" class="block py-2 px-3  bg-brand rounded-sm md:bg-transparent md:p-0" aria-current="page">Home</a>
-                </li>
-                <li>
-                <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent">About</a>
-                </li>
-                <li>
-                <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent">Services</a>
-                </li>
-                <li>
-                <a href="#" class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0 md:dark:hover:bg-transparent">Contact</a>
-                </li>
-            </ul>
+        <div class="hidden items-center gap-8 md:flex">
+            <a href="#services" class="text-sm font-medium text-zinc-600 transition hover:text-[#e32636]">Services</a>
+            <a href="#about" class="text-sm font-medium text-zinc-600 transition hover:text-[#e32636]">About us</a>
+            <a href="#workshop" class="text-sm font-medium text-zinc-600 transition hover:text-[#e32636]">Our workshop</a>
+            <a href="#offers" class="text-sm font-medium text-zinc-600 transition hover:text-[#e32636]">Offers</a>
+            <a href="#contact" class="text-sm font-medium text-zinc-600 transition hover:text-[#e32636]">Contact</a>
         </div>
+        
+        <div class="hidden items-center gap-3 md:flex">
+            @guest
+                <a href="{{ route('login') }}"
+                class="rounded-full border border-zinc-200 px-4 py-2.5 text-sm font-semibold text-zinc-800 transition hover:border-[#e32636] hover:text-[#e32636]">
+                    Login
+                </a>
+            @else
+                <details class="group relative">
+                    <summary
+                        class="flex cursor-pointer list-none items-center gap-2 rounded-full border border-zinc-200 px-4 py-2.5 text-sm font-semibold text-zinc-800 transition hover:border-[#e32636]">
+                        <span class="flex h-7 w-7 items-center justify-center rounded-full bg-[#e32636] text-xs font-bold text-white">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        </span>
 
-        <div class="md:order-2 hidden md:flex items-center justify-between gap-8">
-            <div class="flex items-center justify-center gap-3">
-                <button class="rounded-full bg-primary text-white w-11 h-11 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24"><!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="M19.95 21q-3.125 0-6.175-1.362t-5.55-3.863t-3.862-5.55T3 4.05q0-.45.3-.75t.75-.3H8.1q.35 0 .625.238t.325.562l.65 3.5q.05.4-.025.675T9.4 8.45L6.975 10.9q.5.925 1.187 1.787t1.513 1.663q.775.775 1.625 1.438T13.1 17l2.35-2.35q.225-.225.588-.337t.712-.063l3.45.7q.35.1.575.363T21 15.9v4.05q0 .45-.3.75t-.75.3"/></svg>
-                </button>
-                <div>
-                    <h4 class="text-gray-800">we are always 24/7</h4>
-                    <h3 class="text-primary font-bold">+91-9216111868</h3>
-                </div>
-            </div>
-            <button class="text-md border border-primary rounded-full text-primary font-bold px-5 py-2 flex items-center justify-between gap-2 hover:bg-primary hover:text-white cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5"><path fill="currentColor" d="M13 11V5h2v2.6l5-5L21.4 4l-5 5H19v2zm6.95 10q-3.125 0-6.175-1.362t-5.55-3.863t-3.862-5.55T3 4.05q0-.45.3-.75t.75-.3H8.1q.35 0 .625.238t.325.562l.65 3.5q.05.4-.025.675T9.4 8.45L6.975 10.9q.5.925 1.187 1.787t1.513 1.663q.775.775 1.625 1.438T13.1 17l2.35-2.35q.225-.225.588-.337t.712-.063l3.45.7q.35.1.575.363T21 15.9v4.05q0 .45-.3.75t-.75.3M6.025 9l1.65-1.65L7.25 5H5.025q.125 1.025.35 2.025T6.025 9m8.95 8.95q.975.425 1.988.675T19 18.95v-2.2l-2.35-.475zm0 0"/></svg>
-                Service Enquiry
-            </button>
-            @if (Route::has('login'))
-                <nav class="flex items-center justify-end gap-4">
-                    @auth
-                        <a
-                            href="{{ url('/dashboard') }}"
-                            class="inline-block px-5 py-1.5 text-sm text-gray-800"
-                        >
+                        <span class="max-w-28 truncate">
+                            {{ auth()->user()->name }}
+                        </span>
+
+                        <svg class="h-4 w-4 transition group-open:rotate-180"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="m6 9 6 6 6-6" stroke-linecap="round"
+                                stroke-linejoin="round"/>
+                        </svg>
+                    </summary>
+
+                    <div class="absolute right-0 top-full z-50 mt-3 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white py-2 shadow-xl">
+                        <div class="border-b border-zinc-100 px-4 py-3">
+                            <p class="truncate text-sm font-bold text-zinc-900">
+                                {{ auth()->user()->name }}
+                            </p>
+                            <p class="truncate text-xs text-zinc-500">
+                                {{ auth()->user()->email }}
+                            </p>
+                        </div>
+
+                        <a href="{{ route('dashboard') }}"
+                        class="block px-4 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 hover:text-[#e32636]">
                             Dashboard
                         </a>
-                        <form method="POST" action="{{ route('logout') }}" class="">
-                            @csrf
-                            <button type="submit" icon="arrow-right-start-on-rectangle" class="w-full text-red-800" data-test="logout-button">
-                                {{ __('Log Out') }}
-                            </button>
-                        </form>
-                    @else
-                        <a
-                            href="{{ route('login') }}"
-                            class="inline-block px-5 py-1.5 text-gray-800"
-                        >
-                            Log in
+
+                        <a href="{{ route('profile.edit') }}"
+                        class="block px-4 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 hover:text-[#e32636]">
+                            Profile settings
                         </a>
 
-                        @if (Route::has('register'))
-                            <a
-                                href="{{ route('register') }}"
-                                class="inline-block px-5 py-1.5 text-gray-800">
-                                Register
-                            </a>
-                        @endif
-                    @endauth
-                </nav>
-            @endif
-            
+                        <div class="my-2 border-t border-zinc-100"></div>
+
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit"
+                                    class="w-full px-4 py-2.5 text-left text-sm font-semibold text-red-600 hover:bg-red-50">
+                                Log out
+                            </button>
+                        </form>
+                    </div>
+                </details>
+            @endguest
+
+            {{-- <a href="{{ $whatsappUrl }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="rounded-full border border-zinc-200 px-4 py-2.5 text-sm font-semibold text-zinc-800 transition hover:border-[#e32636] hover:text-[#e32636]">
+                WhatsApp us
+            </a> --}}
+
+            <a href="{{ url('/book-service') }}"
+            class="rounded-full bg-[#e32636] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#c91f2d] flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+                </svg>
+                Book a service 
+            </a>
         </div>
 
+        <button id="mobile-menu-button" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-200 text-zinc-900 md:hidden" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open navigation menu">
+            <svg id="menu-open-icon" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+            <svg id="menu-close-icon" class="hidden h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 6 12 12M18 6 6 18" stroke-linecap="round"/></svg>
+        </button>
+    </nav>
+    <div id="mobile-menu" class="hidden border-t border-zinc-100 bg-white px-5 pb-5 pt-2 md:hidden">
+        <div class="flex flex-col">
+            <a class="mobile-menu-link border-b border-zinc-100 py-3 text-sm font-medium" href="#services">Services</a>
+            <a class="mobile-menu-link border-b border-zinc-100 py-3 text-sm font-medium" href="#about">About us</a>
+            <a class="mobile-menu-link border-b border-zinc-100 py-3 text-sm font-medium" href="#workshop">Our workshop</a>
+            <a class="mobile-menu-link border-b border-zinc-100 py-3 text-sm font-medium" href="#offers">Offers</a>
+            <a class="mobile-menu-link border-b border-zinc-100 py-3 text-sm font-medium" href="#contact">Contact</a>
+        </div>
+        
+        <div class="mt-4 border-t border-zinc-100 pt-4">
+            @guest
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="{{ route('login') }}"
+                    class="rounded-full bg-zinc-900 px-3 py-3 text-center text-sm font-semibold text-white">
+                        Login
+                    </a>
+                </div>
+            @else
+                <div class="rounded-xl bg-zinc-50 p-4">
+                    <p class="text-sm font-bold text-zinc-900">
+                        {{ auth()->user()->name }}
+                    </p>
+                    <p class="mt-1 truncate text-xs text-zinc-500">
+                        {{ auth()->user()->email }}
+                    </p>
+
+                    <div class="mt-3 flex flex-col">
+                        <a href="{{ route('dashboard') }}"
+                        class="py-2 text-sm font-medium text-zinc-700">
+                            Dashboard
+                        </a>
+
+                        <a href="{{ route('profile.edit') }}"
+                        class="py-2 text-sm font-medium text-zinc-700">
+                            Profile settings
+                        </a>
+
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit"
+                                    class="py-2 text-sm font-semibold text-red-600">
+                                Log out
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @endguest
+        </div>
 
     </div>
-</nav>
+</header>

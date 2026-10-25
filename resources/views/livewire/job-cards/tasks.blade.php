@@ -31,12 +31,17 @@
 
         <button
             type="button"
+            wire:click="$set('showAddTaskModal', true)"
             class="inline-flex items-center justify-center gap-2 rounded-lg bg-hitek-red px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-hitek-red-hover"
         >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M12 5v14M5 12h14"/>
+                    d="M12 5v14M5 12h14"/>
             </svg>
 
             Add Task
@@ -242,7 +247,6 @@
             </div>
         </div>
 
-
         <div class="divide-y divide-slate-300">
 
             @foreach ($tasks as $task)
@@ -391,7 +395,6 @@
                         <div class="flex shrink-0 flex-col items-start gap-3 xl:items-end">
 
                             <div class="flex items-center gap-2">
-
                                 @if ($task['priority'] === 'High')
                                     <span class="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-hitek-red">
                                         High Priority
@@ -400,12 +403,15 @@
                                     <span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
                                         Medium Priority
                                     </span>
-                                @else
+                                @elseif ($task['priority'] === 'Low')
                                     <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500">
                                         Low Priority
                                     </span>
+                                @else
+                                    <span class="rounded-full bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-400">
+                                        Priority Not Set
+                                    </span>
                                 @endif
-
                             </div>
 
 
@@ -459,6 +465,69 @@
 
                     </div>
 
+                    @if (!empty($task['parts']))
+                        <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50">
+
+                            <div class="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
+                                <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    Parts
+                                </div>
+
+                                <div class="text-xs text-slate-400">
+                                    {{ count($task['parts']) }}
+                                    {{ count($task['parts']) === 1 ? 'part' : 'parts' }}
+                                </div>
+                            </div>
+
+                            <div class="divide-y divide-slate-200">
+
+                                @foreach ($task['parts'] as $part)
+
+                                    <div class="flex items-center justify-between gap-4 px-4 py-3">
+
+                                        <div class="min-w-0">
+
+                                            <div class="text-sm font-medium text-slate-800">
+                                                {{ $part['name'] }}
+                                            </div>
+
+                                            <div class="mt-0.5 flex flex-wrap gap-2 text-xs text-slate-500">
+
+                                                @if ($part['part_number'])
+                                                    <span>{{ $part['part_number'] }}</span>
+                                                @endif
+
+                                                @if ($part['brand'])
+                                                    <span>• {{ $part['brand'] }}</span>
+                                                @endif
+
+                                                <span>• Qty: {{ $part['quantity'] }}</span>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="shrink-0 text-right">
+
+                                            <div class="text-sm font-semibold text-slate-700">
+                                                ₹{{ number_format((float) $part['total'], 2) }}
+                                            </div>
+
+                                            <div class="mt-0.5 text-xs text-slate-500">
+                                                {{ $part['status'] }}
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                @endforeach
+
+                            </div>
+
+                        </div>
+                    @endif
+
                 </div>
 
             @endforeach
@@ -466,5 +535,225 @@
         </div>
 
     </div>
+
+    {{-- -------------- --}}
+    {{-- Modals Section --}}
+    {{-- -------------- --}}
+
+    {{-- Add Task Modal --}}
+    @if ($showAddTaskModal)
+        <div
+            class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
+        >
+            <div class="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl">
+
+                {{-- Modal Header --}}
+                <div class="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900">
+                            Add Task
+                        </h2>
+
+                        <p class="mt-1 text-sm text-slate-500">
+                            Add a service task to this job card.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        wire:click="$set('showAddTaskModal', false)"
+                        class="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2">
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Modal Body --}}
+                <div class="max-h-[70vh] overflow-y-auto px-6 py-5">
+
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-900">
+                            Select Predefined Service
+                        </h3>
+
+                        <p class="mt-1 text-xs text-slate-500">
+                            Search and select a predefined service. Its description,
+                            department, estimated time and suggested parts will be added automatically.
+                        </p>
+                    </div>
+
+                    {{-- Search --}}
+                    <div class="relative mt-4">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2">
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/>
+                        </svg>
+
+                        <input
+                            type="text"
+                            wire:model.live.debounce.300ms="taskSearch"
+                            placeholder="Search service name..."
+                            autofocus
+                            class="w-full rounded-lg border border-slate-200 py-2.5 pl-10 pr-3 text-sm outline-none transition focus:border-hitek-red focus:ring-2 focus:ring-red-100"
+                        >
+
+                    </div>
+
+                    {{-- Results --}}
+                    @if (count($serviceTaskResults))
+
+                        <div class="mt-3 overflow-hidden rounded-lg border border-slate-200">
+
+                            @foreach ($serviceTaskResults as $serviceTask)
+
+                                <button
+                                    type="button"
+                                    wire:click="addPredefinedTask({{ $serviceTask['id'] }})"
+                                    wire:loading.attr="disabled"
+                                    class="flex w-full items-center justify-between gap-4 border-b border-slate-100 px-4 py-4 text-left transition last:border-b-0 hover:bg-slate-50 disabled:opacity-60"
+                                >
+
+                                    <div class="min-w-0">
+
+                                        <div class="font-semibold text-slate-900">
+                                            {{ $serviceTask['name'] }}
+                                        </div>
+
+                                        <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+
+                                            @if ($serviceTask['category'])
+                                                <span>
+                                                    {{ $serviceTask['category']['name'] }}
+                                                </span>
+                                            @endif
+
+                                            @if ($serviceTask['category'] && $serviceTask['department'])
+                                                <span>•</span>
+                                            @endif
+
+                                            @if ($serviceTask['department'])
+                                                <span>
+                                                    {{ $serviceTask['department']['name'] }}
+                                                </span>
+                                            @endif
+
+                                            @if ($serviceTask['estimated_minutes'])
+                                                <span>•</span>
+                                                <span>
+                                                    @if ($serviceTask['estimated_minutes'] < 60)
+                                                        {{ $serviceTask['estimated_minutes'] }} min
+                                                    @else
+                                                        {{ intdiv($serviceTask['estimated_minutes'], 60) }} hr
+                                                        @if ($serviceTask['estimated_minutes'] % 60)
+                                                            {{ $serviceTask['estimated_minutes'] % 60 }} min
+                                                        @endif
+                                                    @endif
+                                                </span>
+                                            @endif
+
+                                            <span>•</span>
+
+                                            <span>
+                                                {{ $serviceTask['task_parts_count'] }}
+                                                {{ $serviceTask['task_parts_count'] == 1 ? 'part' : 'parts' }}
+                                            </span>
+
+                                        </div>
+
+                                        @if ($serviceTask['description'])
+                                            <div class="mt-2 line-clamp-2 text-xs text-slate-500">
+                                                {{ $serviceTask['description'] }}
+                                            </div>
+                                        @endif
+
+                                    </div>
+
+                                    <div class="shrink-0">
+
+                                        <span class="inline-flex items-center gap-1 rounded-lg bg-hitek-red px-3 py-2 text-xs font-semibold text-white">
+                                            <span wire:loading.remove wire:target="addPredefinedTask({{ $serviceTask['id'] }})">
+                                                Add
+                                            </span>
+
+                                            <span wire:loading wire:target="addPredefinedTask({{ $serviceTask['id'] }})">
+                                                Adding...
+                                            </span>
+                                        </span>
+
+                                    </div>
+
+                                </button>
+
+                            @endforeach
+
+                        </div>
+
+                    @elseif (strlen(trim($taskSearch)) >= 2)
+
+                        <div class="mt-4 rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center">
+
+                            <p class="text-sm font-medium text-slate-600">
+                                No predefined service found.
+                            </p>
+
+                            <p class="mt-1 text-xs text-slate-400">
+                                Try another service name.
+                            </p>
+
+                        </div>
+
+                    @else
+
+                        <div class="mt-4 rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center">
+
+                            <p class="text-sm text-slate-500">
+                                Start typing to search predefined services.
+                            </p>
+
+                        </div>
+
+                    @endif
+
+                </div>
+
+                {{-- Modal Footer --}}
+                <div class="flex items-center justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4">
+
+                    <button
+                        type="button"
+                        wire:click="$set('showAddTaskModal', false)"
+                        class="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="button"
+                        class="rounded-lg bg-hitek-red px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-hitek-red-hover"
+                    >
+                        Add Task
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    @endif
 
 </div>

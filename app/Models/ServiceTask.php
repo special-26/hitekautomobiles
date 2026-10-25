@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Department;
 use App\Models\JobCardTask;
 use App\Models\Part;
 use App\Models\PartCategory;
@@ -20,14 +21,24 @@ class ServiceTask extends Model
         'name',
         'slug',
         'part_category_id',
+        'department_id',
         'description',
         'instructions',
+        'estimated_minutes',
         'is_active',
     ];
 
     protected $casts = [
+        'estimated_minutes' => 'integer',
         'is_active' => 'boolean',
     ];
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(
+            Department::class
+        );
+    }
 
     /**
      * Primary category of the service task.

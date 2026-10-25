@@ -17,6 +17,8 @@ class JobCardEstimate extends Model
         'subtotal',
         'discount',
         'tax',
+        'tax_type',
+        'tax_rate',
         'total',
         'status',
         'created_by',
@@ -26,6 +28,7 @@ class JobCardEstimate extends Model
         'subtotal' => 'decimal:2',
         'discount' => 'decimal:2',
         'tax' => 'decimal:2',
+        'tax_rate' => 'decimal:2',
         'total' => 'decimal:2',
     ];
 

@@ -24,12 +24,18 @@ class Vehicle extends Model
         'engine_number',
         'current_odometer',
         'is_active',
+        'last_service_at',
+        'next_service_at',
+        'insurance_expiry_at',
     ];
 
     protected $casts = [
         'manufacturing_year' => 'integer',
         'current_odometer' => 'integer',
         'is_active' => 'boolean',
+        'last_service_at' => 'date',
+        'next_service_at' => 'date',
+        'insurance_expiry_at' => 'date',
     ];
 
     public function customer(): BelongsTo

@@ -27,12 +27,14 @@ return new class extends Migration
                 ->constrained('vehicles')
                 ->restrictOnDelete();
 
-            // Department
+            // Workshop assignment
+            // Assigned later by Mechanic Coordinator
             $table->foreignId('department_id')
+                ->nullable()
                 ->constrained('departments')
-                ->restrictOnDelete();
+                ->nullOnDelete();
 
-            // Bay
+            // Bay can also be assigned later
             $table->foreignId('bay_id')
                 ->nullable()
                 ->constrained('bays')
@@ -47,15 +49,31 @@ return new class extends Migration
             // Customer complaint / requested work
             $table->text('complaint');
 
+            // Additional customer instructions
             $table->text('customer_notes')
                 ->nullable();
 
-            // Estimated cost
-            $table->decimal('estimated_cost', 12, 2)
+            // Customer acquisition/source
+            $table->string('customer_source')
                 ->nullable();
 
-            // Estimated completion
+            // Vehicle intake information
+            $table->unsignedInteger('odometer')
+                ->nullable();
+
+            $table->string('fuel_level')
+                ->nullable();
+
+            // Arrival
+            $table->timestamp('arrived_at')
+                ->nullable();
+
+            // Expected delivery
             $table->timestamp('estimated_completion_at')
+                ->nullable();
+
+            // Billing
+            $table->decimal('estimated_cost', 12, 2)
                 ->nullable();
 
             // Job Card status

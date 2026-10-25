@@ -1,10 +1,12 @@
 @import 'tailwindcss';
-@import '../../vendor/livewire/flux/dist/flux.css';
+@import '../../vendor/tallstackui/tallstackui/css/v4.css';
 
+@plugin '@tailwindcss/forms'; 
+
+@source '../../vendor/tallstackui/tallstackui/**/*.php'; 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
-@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -58,39 +60,30 @@
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
     }
+    /* Firefox support */
+    * {
+        scrollbar-width: auto;
+        scrollbar-color: theme('colors.slate.500') transparent;
+    }
+
+    /* Chrome, Edge, and Safari support */
+    *::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background-color: theme('colors.slate.500');
+        border-radius: 9999px;
+    }
 }
 
-[data-flux-field]:not(ui-radio, ui-checkbox) {
-    @apply grid gap-2;
-}
-
-[data-flux-label] {
-    @apply  !mb-0 !leading-tight;
-}
-
-input:focus[data-flux-control],
-textarea:focus[data-flux-control],
-select:focus[data-flux-control] {
-    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
-}
-
-
-/* \[:where(&)\]:size-4 {
-    @apply size-4;
-} */
-
-
-.pbmit-element-title {
-    text-shadow: 1px 1px 0 rgba(0,0,0, .2), -1px -1px 0 rgba(0,0,0, .2), 1px -1px 0 rgba(0,0,0, .2), -1px 1px 0 rgba(0,0,0, .2), 1px 1px 0 rgba(0,0,0, .2);
-    -webkit-text-fill-color: #fff;
-    -webkit-text-stroke-width: 2px;
-    color: transparent;
-    font-size: 9em;
-    font-weight: bold;
-}
-.pbmit-element-title:hover{
-    text-shadow: 0px;
-    -webkit-text-fill-color: oklch(0.6332 0.2524 28.6);
-    color: oklch(0.6332 0.2524 28.6);
-    cursor: pointer;
+.ts-carousel img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
 }

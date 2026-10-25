@@ -403,7 +403,7 @@ class JobCardController extends Controller
             'type' => [
                 'required',
                 'string',
-                'in:job_card_created,vehicle_ready,estimate,final',
+                'in:job_card_created,vehicle_ready,invoice_created,estimate,final',
             ],
         ]);
 
@@ -431,6 +431,12 @@ class JobCardController extends Controller
             'final' => $this->generateFinalBillMessage(
                 $jobCard,
                 $messages,
+            ),
+
+            'invoice_created' => $this->whatsappMessageService->invoiceCreated(
+                $jobCard->invoices()
+                    ->latest('id')
+                    ->firstOrFail()
             ),
 
             default => null,

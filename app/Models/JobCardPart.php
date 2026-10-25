@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Models\JobCard;
-use App\Models\JobCardPart;
 use App\Models\JobCardTask;
 use App\Models\Part;
 use App\Models\StoreManagerActivity;

@@ -20,7 +20,7 @@
                 </h1>
 
                 <p class="mt-1 text-sm text-slate-500">
-                    #{{ $jobCard['id'] }}
+                    #{{ $jobCard['job_card_number'] }}
                     <span class="mx-1">•</span>
                     {{ $jobCard['vehicle_no'] }}
                     <span class="mx-1">•</span>

@@ -5,14 +5,17 @@ namespace App\Models;
 use App\Models\Bay;
 use App\Models\Customer;
 use App\Models\Employee;
+use App\Models\JobCardActivity;
 use App\Models\JobCardEstimate;
+use App\Models\JobCardImage;
+use App\Models\JobCardInsurance;
 use App\Models\JobCardInvoice;
 use App\Models\JobCardTask;
-use App\Models\ServiceBooking;
 use App\Models\Vehicle;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class JobCard extends Model
 {
@@ -25,6 +28,10 @@ class JobCard extends Model
         'advisor_id',
         'complaint',
         'customer_notes',
+        'customer_source',
+        'odometer',
+        'fuel_level',
+        'arrived_at',
         'estimated_cost',
         'estimated_completion_at',
         'status',
@@ -32,7 +39,9 @@ class JobCard extends Model
     ];
 
     protected $casts = [
+        'odometer' => 'integer',
         'estimated_cost' => 'decimal:2',
+        'arrived_at' => 'datetime',
         'estimated_completion_at' => 'datetime',
         'is_active' => 'boolean',
     ];
@@ -95,11 +104,6 @@ class JobCard extends Model
         );
     }
 
-    // public function assignments(): HasMany
-    // {
-    //     return $this->hasMany(JobCardAssignment::class);
-    // }
-
     public function parts(): HasMany
     {
         return $this->hasMany(JobCardPart::class);
@@ -115,13 +119,18 @@ class JobCard extends Model
         return $this->hasMany(JobCardInvoice::class);
     }
 
-    // public function photos(): HasMany
-    // {
-    //     return $this->hasMany(JobCardPhoto::class);
-    // }
+    public function insurance(): HasOne
+    {
+        return $this->hasOne(JobCardInsurance::class);
+    }
 
-    // public function statusHistory(): HasMany
-    // {
-    //     return $this->hasMany(JobCardStatusHistory::class);
-    // }
+    public function images()
+    {
+        return $this->hasMany(JobCardImage::class);
+    }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(JobCardActivity::class);
+    }
 }

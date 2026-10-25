@@ -226,16 +226,15 @@
                                 default => 'bg-slate-50 text-slate-600 border-slate-100',
                             };
 
-                            $icon = match ($item['icon']) {
-                                'plus' => '+',
-                                'user' => 'U',
-                                'task' => 'T',
-                                'wrench' => 'W',
-                                'parts' => 'P',
-                                'check' => '✓',
-                                'billing' => '₹',
-                                'payment' => '₹',
-                                'status' => 'S',
+                            $icon = match ($item['type']) {
+                                'Job Card' => '+',
+                                'Customer' => 'U',
+                                'Task' => 'T',
+                                'Assignment' => 'W',
+                                'Parts' => 'P',
+                                'Billing' => '₹',
+                                'Payment' => '₹',
+                                'Status' => 'S',
                                 default => '•',
                             };
                         @endphp

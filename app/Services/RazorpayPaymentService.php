@@ -88,13 +88,42 @@ class RazorpayPaymentService
     public function getOrCreateInvoicePaymentLink(
         JobCardInvoice $invoice
     ): string {
-        // Reuse an existing payment link if available
+        $invoice->loadMissing([
+            'jobCard.customer',
+            'jobCard.vehicle',
+            'payments',
+        ]);
+
+        $totalAmount = (float) $invoice->total;
+
+        $paidAmount = (float) $invoice->payments
+            ->where('status', 'success')
+            ->sum('amount');
+
+        $dueAmount = max($totalAmount - $paidAmount, 0);
+
+        if ($dueAmount <= 0) {
+            throw new RuntimeException(
+                'This invoice has already been fully paid.'
+            );
+        }
+
+        /*
+        * Reuse an existing link only when it is still valid
+        * and its amount matches the current outstanding amount.
+        */
         if (
             $invoice->razorpay_payment_link_id &&
             $invoice->razorpay_payment_link_url &&
             $invoice->razorpay_payment_status !== 'paid'
         ) {
-            return $invoice->razorpay_payment_link_url;
+            $existingAmount = (float) $invoice->getAttribute(
+                'razorpay_payment_link_amount'
+            );
+
+            if ($existingAmount > 0 && $existingAmount === $dueAmount) {
+                return $invoice->razorpay_payment_link_url;
+            }
         }
 
         $jobCard = $invoice->jobCard;
@@ -102,9 +131,7 @@ class RazorpayPaymentService
         $customer = $jobCard?->customer;
 
         $customerName = $customer?->name ?? 'Customer';
-
         $customerPhone = $customer?->phone;
-
         $customerEmail = $customer?->email;
 
         $jobCardNumber = $jobCard?->job_card_number
@@ -114,18 +141,19 @@ class RazorpayPaymentService
         $referenceId = 'INV-' . $invoice->id . '-' . time();
 
         $result = $this->createPaymentLink(
-            amount: (float) $invoice->total,
+            amount: $dueAmount,
             customerName: $customerName,
             customerPhone: $customerPhone,
             customerEmail: $customerEmail,
             referenceId: $referenceId,
-            description: 'Hitek Automobiles Final Bill '
+            description: 'Hitek Automobiles Outstanding Bill '
                 . $jobCardNumber
         );
 
         $invoice->update([
             'razorpay_payment_link_id' => $result['id'],
             'razorpay_payment_link_url' => $result['short_url'],
+            'razorpay_payment_link_amount' => $dueAmount,
             'razorpay_payment_status' => $result['status'],
             'razorpay_payment_link_created_at' => now(),
         ]);

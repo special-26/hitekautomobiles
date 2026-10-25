@@ -17,42 +17,33 @@ return new class extends Migration
                 ->constrained('customers')
                 ->cascadeOnDelete();
 
-            $table->string('registration_number')
-                ->unique();
-
+            $table->string('registration_number')->unique();
             $table->string('make');
-
             $table->string('model');
+            $table->string('variant')->nullable();
 
-            $table->string('variant')
-                ->nullable();
+            $table->string('fuel_type')->nullable();
 
-            $table->string('fuel_type')
-                ->nullable();
+            $table->unsignedSmallInteger('manufacturing_year')->nullable();
 
-            $table->unsignedSmallInteger('manufacturing_year')
-                ->nullable();
+            $table->string('color')->nullable();
+            $table->string('vin')->nullable()->unique();
 
-            $table->string('color')
-                ->nullable();
+            $table->string('engine_number')->nullable()->unique();
+            $table->unsignedInteger('current_odometer')->nullable();
 
-            $table->string('vin')
-                ->nullable()
-                ->unique();
+            $table->date('last_service_at')->nullable();
+            $table->date('next_service_at')->nullable();
+            $table->date('insurance_expiry_at')->nullable();
 
-            $table->string('engine_number')
-                ->nullable()
-                ->unique();
 
-            $table->unsignedInteger('current_odometer')
-                ->nullable();
-
-            $table->boolean('is_active')
-                ->default(true);
+            $table->boolean('is_active')->default(true);
 
             $table->timestamps();
 
             $table->index('customer_id');
+            $table->index('next_service_at');
+            $table->index('insurance_expiry_at');
         });
     }
 

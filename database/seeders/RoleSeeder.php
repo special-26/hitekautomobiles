@@ -18,7 +18,7 @@ class RoleSeeder extends Seeder
     {
         /*
         |--------------------------------------------------------------------------
-        | Super Admin
+        | Roles
         |--------------------------------------------------------------------------
         */
 
@@ -27,22 +27,10 @@ class RoleSeeder extends Seeder
             'guard_name' => 'web',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Admin
-        |--------------------------------------------------------------------------
-        */
-
         $admin = Role::firstOrCreate([
             'name' => 'Admin',
             'guard_name' => 'web',
         ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Advisor
-        |--------------------------------------------------------------------------
-        */
 
         $advisor = Role::firstOrCreate([
             'name' => 'Advisor',
@@ -51,8 +39,11 @@ class RoleSeeder extends Seeder
 
         /*
         |--------------------------------------------------------------------------
-        | Floor Manager
+        | Nuxt / Operational Roles
         |--------------------------------------------------------------------------
+        |
+        | These roles are still used by the Nuxt applications.
+        |
         */
 
         $floorManager = Role::firstOrCreate([
@@ -60,22 +51,10 @@ class RoleSeeder extends Seeder
             'guard_name' => 'web',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Mechanic
-        |--------------------------------------------------------------------------
-        */
-
         $mechanic = Role::firstOrCreate([
             'name' => 'Mechanic',
             'guard_name' => 'web',
         ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Store Manager
-        |--------------------------------------------------------------------------
-        */
 
         $autoPartsStoreManager = Role::firstOrCreate([
             'name' => 'Auto Parts Store Manager',
@@ -87,78 +66,77 @@ class RoleSeeder extends Seeder
             'guard_name' => 'web',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Customer Support
-        |--------------------------------------------------------------------------
-        */
-
         $customerSupport = Role::firstOrCreate([
             'name' => 'Customer Support',
             'guard_name' => 'web',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Mechanic Coordinator
-        |--------------------------------------------------------------------------
-        */
         $mechanicCoordinator = Role::firstOrCreate([
             'name' => 'Mechanic Coordinator',
             'guard_name' => 'web',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Customers
-        |--------------------------------------------------------------------------
-        */
         $customer = Role::firstOrCreate([
             'name' => 'Customer',
             'guard_name' => 'web',
         ]);
 
         /*
-|--------------------------------------------------------------------------
-| Assign Permissions
-|--------------------------------------------------------------------------
-*/
+        |--------------------------------------------------------------------------
+        | Super Admin
+        |--------------------------------------------------------------------------
+        |
+        | Super Admin is an owner / oversight role.
+        |
+        | It should NOT automatically receive every permission.
+        | Operational changes belong to Admin.
+        |
+        */
 
-        // Super Admin gets everything.
         $superAdmin->syncPermissions([
-            Permission::query()
-                ->where('guard_name', 'web')
-                ->pluck('name')
-                ->all()
-        ]);
-
-        // Admin
-        $admin->syncPermissions([
-            // Dashboard
             'dashboard.view',
 
-            // Employees
+            // Owner / statistics
+            'owner.dashboard.view',
+            'owner.statistics.view',
+            'owner.reports.view',
+            'owner.activity.view',
+
+            // Admin account management
+            'admin-users.view',
+            'admin-users.create',
+            'admin-users.status.update',
+
+            // Read-only business visibility
+            'customers.view',
+            'vehicles.view',
+            'job-cards.view',
+            'job-cards-tasks.view',
+
+            // Financial visibility
+            'payments.view',
+            'finance.view',
+            'finance.reports.view',
+
+            // Reports
+            'reports.view',
+
+            // Employee / payroll visibility
             'employees.view',
-            'employees.create',
-            'employees.update',
-            'employees.status.update',
+            'payroll.view',
+        ]);
 
-            // Department
-            'departments.view',
-            'departments.create',
-            'departments.update',
-            'departments.status.update',
+        /*
+        |--------------------------------------------------------------------------
+        | Admin
+        |--------------------------------------------------------------------------
+        |
+        | Admin gets full Laravel management access.
+        |
+        */
 
-            // Roles
-            'roles.view',
-            'roles.create',
-            'roles.update',
-
-            // Bays
-            'bays.view',
-            'bays.create',
-            'bays.update',
-            'bays.status.update',
+        $admin->syncPermissions([
+            'dashboard.view',
 
             // Customers
             'customers.view',
@@ -178,13 +156,7 @@ class RoleSeeder extends Seeder
             'job-cards.update',
             'job-cards.status.update',
 
-            // Parts
-            'parts.view',
-            'parts.create',
-            'parts.update',
-            'parts.status.update',
-
-            // Job Card Task Permissions
+            // Job Card Tasks
             'job-cards-tasks.view',
             'job-cards-tasks.create',
             'job-cards-tasks.update',
@@ -196,20 +168,160 @@ class RoleSeeder extends Seeder
             'service-tasks.update',
             'service-tasks.status.update',
 
-            // Service Task Suggested Parts
+            // Service Task Parts
             'service-task-parts.view',
             'service-task-parts.create',
             'service-task-parts.remove',
 
-            // Vehicle & Parts Catalog
+            // Job Card Parts visibility / management
+            'job-card-parts.view',
+            'job-card-parts.request',
+            'job-card-parts.create',
+            'job-card-parts.update',
+            'job-card-parts.remove',
+
+            // Job Card Billing
+            'job-cards.estimate.view',
+            'job-cards.estimate.create',
+            'job-cards.estimate.update',
+            'job-cards.final-bill.view',
+            'job-cards.final-bill.create',
+            'job-cards.final-bill.update',
+
+            // Payments
+            'payments.view',
+            'payments.create',
+            'payments.update',
+
+            // Finance
+            'finance.view',
+            'finance.manage',
+            'finance.reports.view',
+
+            // Reports
+            'reports.view',
+
+            // Bays
+            'bays.view',
+            'bays.create',
+            'bays.update',
+            'bays.status.update',
+
+            // Parts
+            'parts.view',
+            'parts.create',
+            'parts.update',
+            'parts.status.update',
+            'parts.manage',
+            'parts.receive',
+            'parts.issue',
+            'parts.return',
+            'parts.adjust',
+            'parts.suppliers.manage',
+
+            // General Inventory
+            'inventory.view',
+            'inventory.manage',
+            'inventory.receive',
+            'inventory.issue',
+            'inventory.return',
+            'inventory.adjust',
+
+            // Bookings
+            'bookings.view',
+            'bookings.create',
+            'bookings.update',
+            'bookings.status.update',
+
+            // Employees
+            'employees.view',
+            'employees.create',
+            'employees.update',
+            'employees.status.update',
+
+            'employees.bank-details.manage',
+            'employees.salary.manage',
+
+            'attendance.view',
+            'attendance.manage',
+            'attendance.check-in',
+            'attendance.check-out',
+
+            'shifts.view',
+            'shifts.manage',
+
+            'payroll.settings.manage',
+            'payroll.view',
+            'payroll.calculate',
+            'payroll.approve',
+            'payroll.payment.manage',
+
+            'company-holidays.view',
+            'company-holidays.manage',
+
+            'leave-requests.view',
+            'leave-requests.review',
+
+            'marketing-studio.view',
+
+            // Departments
+            'departments.view',
+            'departments.create',
+            'departments.update',
+            'departments.status.update',
+
+            // Roles
+            'roles.view',
+            'roles.create',
+            'roles.update',
+
+            // Payroll
+            'payroll.view',
+            'payroll.manage',
+
+            // Settings
+            'settings.view',
+            'settings.update',
+
+            // Catalog
             'catalog.view',
             'catalog.create',
             'catalog.update',
             'catalog.status.update',
 
+            // Admin user management
+            'admin-users.view',
+            'admin-users.create',
+            'admin-users.status.update',
         ]);
 
-        // Advisor
+        /*
+        |--------------------------------------------------------------------------
+        | Advisor
+        |--------------------------------------------------------------------------
+        |
+        | Front-desk / customer-facing operational role.
+        |
+        | Advisor can:
+        | - Manage customers
+        | - Manage vehicles
+        | - Create/update job cards
+        | - Update job-card workflow status
+        | - Add predefined tasks
+        | - Prepare estimate/final bill
+        |
+        | Advisor cannot:
+        | - Assign mechanics
+        | - Assign bays
+        | - Request/issue/return parts
+        | - Manage inventory
+        | - Manage employees
+        | - Manage payroll
+        | - Manage finance
+        | - Manage settings
+        |
+        */
+
         $advisor->syncPermissions([
             'dashboard.view',
 
@@ -223,37 +335,33 @@ class RoleSeeder extends Seeder
             'vehicles.create',
             'vehicles.update',
 
-            // Employees - View only if required for display
-            'employees.view',
-
-            // Departments
-            'departments.view',
-
-            // Bays - View only
-            'bays.view',
-
             // Job Cards
             'job-cards.view',
             'job-cards.create',
             'job-cards.update',
             'job-cards.status.update',
 
-            'job-card-parts.view',
-
             // Job Card Tasks
             'job-cards-tasks.view',
             'job-cards-tasks.create',
             'job-cards-tasks.update',
 
-            // Billing
+            // Job Card Billing
+            'job-cards.estimate.view',
             'job-cards.estimate.create',
             'job-cards.estimate.update',
+
+            'job-cards.final-bill.view',
             'job-cards.final-bill.create',
             'job-cards.final-bill.update',
-
         ]);
 
-        // Floor Manager
+        /*
+        |--------------------------------------------------------------------------
+        | Floor Manager
+        |--------------------------------------------------------------------------
+        */
+
         $floorManager->syncPermissions([
             'dashboard.view',
 
@@ -274,7 +382,12 @@ class RoleSeeder extends Seeder
             'inventory.view',
         ]);
 
-        // Mechanic
+        /*
+        |--------------------------------------------------------------------------
+        | Mechanic
+        |--------------------------------------------------------------------------
+        */
+
         $mechanic->syncPermissions([
             'dashboard.view',
 
@@ -285,11 +398,15 @@ class RoleSeeder extends Seeder
             'parts.view',
         ]);
 
-        // AutoPart Store Manager
+        /*
+        |--------------------------------------------------------------------------
+        | Auto Parts Store Manager
+        |--------------------------------------------------------------------------
+        */
+
         $autoPartsStoreManager->syncPermissions([
             'dashboard.view',
 
-            // Auto Parts
             'parts.view',
             'parts.manage',
             'parts.receive',
@@ -298,21 +415,23 @@ class RoleSeeder extends Seeder
             'parts.adjust',
             'parts.suppliers.manage',
 
-            // Job Card Parts
             'job-card-parts.view',
 
-            // Vehicle & Parts Catalog
             'catalog.view',
             'catalog.create',
             'catalog.update',
             'catalog.status.update',
         ]);
 
-        // General Store Manager
+        /*
+        |--------------------------------------------------------------------------
+        | General Store Manager
+        |--------------------------------------------------------------------------
+        */
+
         $generalStoreManager->syncPermissions([
             'dashboard.view',
 
-            // General Inventory
             'inventory.view',
             'inventory.manage',
             'inventory.receive',
@@ -321,7 +440,12 @@ class RoleSeeder extends Seeder
             'inventory.adjust',
         ]);
 
-        // Customer Support
+        /*
+        |--------------------------------------------------------------------------
+        | Customer Support
+        |--------------------------------------------------------------------------
+        */
+
         $customerSupport->syncPermissions([
             'dashboard.view',
 
@@ -336,32 +460,30 @@ class RoleSeeder extends Seeder
             'job-cards.view',
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Mechanic Coordinator
+        |--------------------------------------------------------------------------
+        */
+
         $mechanicCoordinator->syncPermissions([
             'dashboard.view',
 
-            // Employees
             'employees.view',
-
-            // Departments
             'departments.view',
 
-            // Customers - View only
             'customers.view',
-
-            // Vehicles - View only
             'vehicles.view',
 
-            // Job Cards
             'job-cards.view',
             'job-cards.update',
 
-            // Job Card Tasks
             'job-cards-tasks.view',
             'job-cards-tasks.create',
             'job-cards-tasks.update',
             'job-cards-tasks.status.update',
 
-            // Mechanic and Bay Assignment
+            // Mechanic / Bay assignment
             'job-cards-tasks.assign-mechanic',
             'job-cards-tasks.assign-bay',
 
@@ -369,7 +491,7 @@ class RoleSeeder extends Seeder
             'bays.view',
             'bays.update',
 
-            // Parts - Catalog View Only
+            // Parts catalog
             'parts.view',
 
             // Job Card Parts
@@ -380,9 +502,16 @@ class RoleSeeder extends Seeder
             'job-card-parts.remove',
         ]);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Customer
+        |--------------------------------------------------------------------------
+        */
+
         $customer->syncPermissions([
             'customers.view',
             'customers.update',
+
             'vehicles.view',
             'vehicles.create',
             'vehicles.update',
@@ -400,12 +529,12 @@ class RoleSeeder extends Seeder
             ],
             [
                 'name' => 'Hitek Automobiles',
-                'password' => 'password',
+                'password' => Hash::make('password'),
                 'is_active' => true,
             ]
         );
 
-        $AdminUser = User::firstOrCreate(
+        $adminUser = User::firstOrCreate(
             [
                 'email' => 'admin@hitekautomobiles.com',
             ],
@@ -415,9 +544,8 @@ class RoleSeeder extends Seeder
                 'is_active' => true,
             ]
         );
-        $AdminUser->assignRole('Admin');
 
         $superAdminUser->syncRoles([$superAdmin]);
-        $AdminUser->syncRoles([$admin]);
+        $adminUser->syncRoles([$admin]);
     }
 }
