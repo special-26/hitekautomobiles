@@ -67,260 +67,401 @@
             </p>
         </div>
 
-        @if ($submitted)
-            <div class="mb-6 rounded-xl border border-green-200 bg-green-50 p-5 text-green-800">
-                Your details have been validated.
+        @if ($submitted && $bookingReference)
+            <div class="mb-8 rounded-2xl border border-green-200 bg-green-50 p-6">
+                <div class="flex items-start gap-3">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-700">
+                        ✓
+                    </span>
+
+                    <div>
+                        <h3 class="text-lg font-bold text-green-900">
+                            Booking request received
+                        </h3>
+
+                        <p class="mt-1 text-sm leading-6 text-green-800">
+                            Your reference is
+                            <strong>{{ $bookingReference }}</strong>.
+                            Hitek Automobiles will verify your appointment and contact you.
+                        </p>
+
+                        <p class="mt-2 text-xs text-green-700">
+                            Your appointment is pending confirmation.
+                        </p>
+                    </div>
+                </div>
             </div>
         @endif
 
+        
         <form wire:submit="submit" id="booking-form-fields" class="space-y-8">
 
-            {{-- Customer details --}}
+            {{-- Step 1: Select date and appointment slot --}}
             <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
-                <div class="mb-6 flex items-center gap-3">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 font-bold text-red-600">01</span>
-                    <div>
-                        <h3 class="text-lg font-bold">Your details</h3>
-                        <p class="text-sm text-gray-500">How can we contact you?</p>
-                    </div>
+                <div class="mb-6">
+                    <p class="text-sm font-bold uppercase tracking-widest text-red-600">
+                        Step 1
+                    </p>
+                    <h3 class="mt-2 text-2xl font-black">
+                        Choose your appointment
+                    </h3>
+                    <p class="mt-2 text-sm text-gray-500">
+                        Select a date and an available time slot before entering your details.
+                    </p>
                 </div>
 
-                <div class="grid gap-5 sm:grid-cols-2">
-                    <div>
-                        <label for="customerName" class="mb-2 block text-sm font-semibold">
-                            Full name *
-                        </label>
-                        <input id="customerName" type="text"
-                               wire:model="customerName"
-                               autocomplete="name"
-                               placeholder="Enter your full name"
-                               class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-100">
-                        @error('customerName')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="phone" class="mb-2 block text-sm font-semibold">
-                            Mobile number *
-                        </label>
-                        <input id="phone" type="tel"
-                               wire:model="phone"
-                               inputmode="numeric"
-                               maxlength="10"
-                               autocomplete="tel-national"
-                               placeholder="10-digit mobile number"
-                               class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-100">
-                        @error('phone')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="sm:col-span-2">
-                        <label for="email" class="mb-2 block text-sm font-semibold">
-                            Email address <span class="font-normal text-gray-400">(optional)</span>
-                        </label>
-                        <input id="email" type="email"
-                               wire:model="email"
-                               autocomplete="email"
-                               placeholder="you@example.com"
-                               class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-100">
-                        @error('email')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-
-            {{-- Vehicle details --}}
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
-                <div class="mb-6 flex items-center gap-3">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 font-bold text-red-600">02</span>
-                    <div>
-                        <h3 class="text-lg font-bold">Vehicle details</h3>
-                        <p class="text-sm text-gray-500">Tell us which car needs attention.</p>
-                    </div>
-                </div>
-
-                <div class="grid gap-5 sm:grid-cols-2">
-                    <div>
-                        <label for="vehicleMake" class="mb-2 block text-sm font-semibold">
-                            Car make *
-                        </label>
-                        <input id="vehicleMake" type="text"
-                               wire:model="vehicleMake"
-                               placeholder="e.g. Maruti Suzuki, Hyundai"
-                               class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100">
-                        @error('vehicleMake')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label for="vehicleModel" class="mb-2 block text-sm font-semibold">
-                            Model / variant *
-                        </label>
-                        <input id="vehicleModel" type="text"
-                               wire:model="vehicleModel"
-                               placeholder="e.g. Swift VXi, Creta SX"
-                               class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100">
-                        @error('vehicleModel')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="sm:col-span-2">
-                        <label for="registrationNumber" class="mb-2 block text-sm font-semibold">
-                            Registration number <span class="font-normal text-gray-400">(optional)</span>
-                        </label>
-                        <input id="registrationNumber" type="text"
-                               wire:model="registrationNumber"
-                               placeholder="e.g. CH01AB1234"
-                               class="w-full rounded-lg border border-gray-300 px-4 py-3 uppercase outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100">
-                        @error('registrationNumber')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-
-            {{-- Service selection --}}
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
-                <div class="mb-6 flex items-center gap-3">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 font-bold text-red-600">03</span>
-                    <div>
-                        <h3 class="text-lg font-bold">What does your car need?</h3>
-                        <p class="text-sm text-gray-500">Select the service you want to discuss.</p>
-                    </div>
-                </div>
-
-                <div class="grid gap-3 sm:grid-cols-2">
-                    @php
-                        $serviceOptions = [
-                            'regular-service' => 'Regular Service & Maintenance',
-                            'denting-painting' => 'Denting & Painting',
-                            'car-washing' => 'Car Washing',
-                            'detailing' => 'Car Detailing',
-                            'ceramic-coating' => 'Ceramic Coating',
-                            'ppf' => 'Paint Protection Film (PPF)',
-                            'insurance' => 'Insurance Assistance / Claims',
-                            'other' => 'Other / Multiple Services',
-                        ];
-                    @endphp
-
-                    @foreach ($serviceOptions as $value => $label)
-                        <label class="flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition
-                            {{ $serviceCategory === $value ? 'border-red-500 bg-red-50' : 'border-gray-200 hover:border-gray-400' }}">
-                            <input type="radio"
-                                   wire:model.live="serviceCategory"
-                                   value="{{ $value }}"
-                                   class="mt-1 accent-red-600">
-                            <span class="text-sm font-semibold">{{ $label }}</span>
-                        </label>
-                    @endforeach
-                </div>
-
-                @error('serviceCategory')
-                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-
-                <div class="mt-5">
-                    <label for="serviceDetails" class="mb-2 block text-sm font-semibold">
-                        Additional requirements
-                        <span class="font-normal text-gray-400">(optional)</span>
+                <div class="mb-6 max-w-sm">
+                    <label for="preferredDate" class="mb-2 block text-sm font-semibold">
+                        Appointment date *
                     </label>
-                    <textarea id="serviceDetails"
-                              wire:model="serviceDetails"
-                              rows="4"
-                              placeholder="Describe the issue, work required, or any special requests..."
-                              class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"></textarea>
-                    @error('serviceDetails')
+
+                    <input
+                        id="preferredDate"
+                        type="date"
+                        wire:model.live="preferredDate"
+                        min="{{ now()->toDateString() }}"
+                        max="{{ now()->addDays((int) config('service_booking.advance_booking_days', 30))->toDateString() }}"
+                        class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+                    >
+
+                    @error('preferredDate')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                        <label class="text-sm font-semibold">
+                            Available time slots
+                        </label>
+
+                        <span class="text-xs text-gray-500">
+                            Red/grey slots cannot be selected
+                        </span>
+                    </div>
+
+                    @if (count($this->slotOptions))
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+                            @foreach ($this->slotOptions as $option)
+                                <label
+                                    wire:key="slot-{{ $preferredDate }}-{{ $option['time'] }}"
+                                    @class([
+                                        'rounded-xl border p-3 text-center transition',
+                                        'cursor-pointer border-red-600 bg-red-50 text-red-700 ring-2 ring-red-100'
+                                            => $preferredTime === $option['time'] && $option['available'],
+                                        'cursor-pointer border-gray-200 bg-white hover:border-red-300'
+                                            => $option['available'] && $preferredTime !== $option['time'],
+                                        'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400 opacity-75'
+                                            => ! $option['available'],
+                                    ])
+                                >
+                                    <input
+                                        type="radio"
+                                        wire:model.live="preferredTime"
+                                        value="{{ $option['time'] }}"
+                                        @disabled(! $option['available'])
+                                        class="sr-only"
+                                    >
+
+                                    <span class="block text-sm font-bold">
+                                        {{ \Carbon\Carbon::createFromFormat('H:i', $option['time'])->format('g:i A') }}
+                                    </span>
+
+                                    <span class="mt-1 block text-xs">
+                                        {{ $option['reason'] }}
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+
+                        @if (count($this->availableSlots) === 0)
+                            <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                                No appointments are available for this date.
+                                Please choose another date above.
+                            </div>
+                        @endif
+                    @else
+                        <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                            No appointment slots are configured for this date.
+                            Please choose another date.
+                        </div>
+                    @endif
+
+                    @error('preferredTime')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
             </div>
 
-            {{-- Appointment preferences --}}
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
-                <div class="mb-6 flex items-center gap-3">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 font-bold text-red-600">04</span>
-                    <div>
-                        <h3 class="text-lg font-bold">Preferred appointment</h3>
-                        <p class="text-sm text-gray-500">Choose your preferred date and time.</p>
+            {{-- Show the remaining form only after selecting an available slot --}}
+            @if ($preferredTime && in_array($preferredTime, $this->availableSlots, true))
+                <div class="rounded-xl border border-green-200 bg-green-50 p-4">
+                    <p class="text-sm font-semibold text-green-900">
+                        Appointment slot selected
+                    </p>
+                    <p class="mt-1 text-sm text-green-800">
+                        {{ \Carbon\Carbon::parse($preferredDate)->format('l, d M Y') }}
+                        at
+                        {{ \Carbon\Carbon::createFromFormat('H:i', $preferredTime)->format('g:i A') }}
+                    </p>
+                    <p class="mt-1 text-xs text-green-700">
+                        Complete your details below to request this appointment.
+                    </p>
+                </div>
+
+                {{-- Keep your existing Customer details, Vehicle details,
+                    Service selection and Submit sections below this point. --}}
+
+                {{-- Customer details --}}
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
+                    <div class="mb-6 flex items-center gap-3">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 font-bold text-red-600">01</span>
+                        <div>
+                            <h3 class="text-lg font-bold">Your details</h3>
+                            <p class="text-sm text-gray-500">How can we contact you?</p>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-5 sm:grid-cols-2">
+                        <div>
+                            <label for="customerName" class="mb-2 block text-sm font-semibold">
+                                Full name *
+                            </label>
+                            <input id="customerName" type="text"
+                                wire:model="customerName"
+                                autocomplete="name"
+                                placeholder="Enter your full name"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-100">
+                            @error('customerName')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="phone" class="mb-2 block text-sm font-semibold">
+                                Mobile number *
+                            </label>
+                            <input id="phone" type="tel"
+                                wire:model="phone"
+                                inputmode="numeric"
+                                maxlength="10"
+                                autocomplete="tel-national"
+                                placeholder="10-digit mobile number"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-100">
+                            @error('phone')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label for="email" class="mb-2 block text-sm font-semibold">
+                                Email address <span class="font-normal text-gray-400">(optional)</span>
+                            </label>
+                            <input id="email" type="email"
+                                wire:model="email"
+                                autocomplete="email"
+                                placeholder="you@example.com"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-red-500 focus:ring-2 focus:ring-red-100">
+                            @error('email')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid gap-5 sm:grid-cols-2">
-                    <div>
-                        <label for="preferredDate" class="mb-2 block text-sm font-semibold">
-                            Preferred date *
-                        </label>
-                        <input id="preferredDate"
-                               type="date"
-                               wire:model="preferredDate"
-                               min="{{ now()->toDateString() }}"
-                               class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100">
-                        @error('preferredDate')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                {{-- Vehicle details --}}
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
+                    <div class="mb-6 flex items-center gap-3">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 font-bold text-red-600">02</span>
+                        <div>
+                            <h3 class="text-lg font-bold">Vehicle details</h3>
+                            <p class="text-sm text-gray-500">Tell us which car needs attention.</p>
+                        </div>
                     </div>
 
-                    <div>
-                        <label for="preferredTime" class="mb-2 block text-sm font-semibold">
-                            Preferred time *
+                    <div class="grid gap-5 sm:grid-cols-2">
+                        <div>
+                            <label for="vehicleMake" class="mb-2 block text-sm font-semibold">
+                                Car make *
+                            </label>
+                            <input id="vehicleMake" type="text"
+                                wire:model="vehicleMake"
+                                placeholder="e.g. Maruti Suzuki, Hyundai"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100">
+                            @error('vehicleMake')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="vehicleModel" class="mb-2 block text-sm font-semibold">
+                                Model / variant *
+                            </label>
+                            <input id="vehicleModel" type="text"
+                                wire:model="vehicleModel"
+                                placeholder="e.g. Swift VXi, Creta SX"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100">
+                            @error('vehicleModel')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label for="registrationNumber" class="mb-2 block text-sm font-semibold">
+                                Registration number *
+                            </label>
+                            <input id="registrationNumber" type="text"
+                                wire:model="registrationNumber"
+                                placeholder="e.g. CH01AB1234"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-3 uppercase outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100">
+                            @error('registrationNumber')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Service selection --}}
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
+                    <div class="mb-6 flex items-center gap-3">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 font-bold text-red-600">03</span>
+                        <div>
+                            <h3 class="text-lg font-bold">What does your car need?</h3>
+                            <p class="text-sm text-gray-500">Select the service you want to discuss.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        @php
+                            $serviceOptions = [
+                                'regular-service' => 'Regular Service & Maintenance',
+                                'denting-painting' => 'Denting & Painting',
+                                'car-washing' => 'Car Washing',
+                                'detailing' => 'Car Detailing',
+                                'ceramic-coating' => 'Ceramic Coating',
+                                'ppf' => 'Paint Protection Film (PPF)',
+                                'insurance' => 'Insurance Assistance / Claims',
+                                'other' => 'Other / Multiple Services',
+                            ];
+                        @endphp
+
+                        @foreach ($serviceOptions as $value => $label)
+                            <label class="flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition
+                                {{ $serviceCategory === $value ? 'border-red-500 bg-red-50' : 'border-gray-200 hover:border-gray-400' }}">
+                                <input type="radio"
+                                    wire:model.live="serviceCategory"
+                                    value="{{ $value }}"
+                                    class="mt-1 accent-red-600">
+                                <span class="text-sm font-semibold">{{ $label }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+
+                    @error('serviceCategory')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+
+                    <div class="mt-5">
+                        <label for="serviceDetails" class="mb-2 block text-sm font-semibold">
+                            Additional requirements
+                            <span class="font-normal text-gray-400">(optional)</span>
                         </label>
-                        <select id="preferredTime"
-                                wire:model="preferredTime"
-                                class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100">
-                            <option value="">Choose a preferred time</option>
-                            <option value="09:00">9:00 AM</option>
-                            <option value="10:00">10:00 AM</option>
-                            <option value="11:00">11:00 AM</option>
-                            <option value="12:00">12:00 PM</option>
-                            <option value="13:00">1:00 PM</option>
-                            <option value="14:00">2:00 PM</option>
-                            <option value="15:00">3:00 PM</option>
-                            <option value="16:00">4:00 PM</option>
-                            <option value="17:00">5:00 PM</option>
-                        </select>
-                        @error('preferredTime')
+                        <textarea id="serviceDetails"
+                                wire:model="serviceDetails"
+                                rows="4"
+                                placeholder="Describe the issue, work required, or any special requests..."
+                                class="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"></textarea>
+                        @error('serviceDetails')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
 
-                <p class="mt-4 rounded-lg bg-amber-50 p-4 text-sm leading-6 text-amber-800">
-                    Your selected date and time are preferences, not a confirmed
-                    reservation. Final availability must be checked by Hitek
-                    Automobiles before the appointment is confirmed.
-                </p>
-            </div>
+                {{-- Pick and Drop --}}
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 sm:p-8">
+                    <h3 class="text-lg font-bold">Pick-up and drop-off</h3>
 
-            {{-- Submit --}}
-            <div class="rounded-2xl bg-[#111111] p-6 text-white sm:p-8">
-                <h3 class="text-xl font-bold">Ready to take the next step?</h3>
-                <p class="mt-2 text-sm leading-6 text-gray-400">
-                    Review your information before submitting your appointment request.
-                </p>
+                    <label class="mt-4 flex items-center gap-3">
+                        <input
+                            type="checkbox"
+                            wire:model.live="pickupDropRequired"
+                            class="h-4 w-4 accent-red-600"
+                        >
+                        <span class="text-sm font-semibold">
+                            I need vehicle pick-up and drop-off
+                        </span>
+                    </label>
 
-                <button type="submit"
-                        wire:loading.attr="disabled"
-                        wire:target="submit"
-                        class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-6 py-4 font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
-                    <span wire:loading.remove wire:target="submit">
-                        Submit Booking Request →
-                    </span>
-                    <span wire:loading wire:target="submit">
-                        Validating details...
-                    </span>
-                </button>
+                    @if ($pickupDropRequired)
+                        <div class="mt-5 grid gap-5 sm:grid-cols-2">
+                            <div class="sm:col-span-2">
+                                <label class="mb-2 block text-sm font-semibold">
+                                    Pick-up address *
+                                </label>
 
-                <p class="mt-4 text-xs leading-5 text-gray-500">
-                    By submitting, you agree that Hitek Automobiles may contact
-                    you about this service request.
-                </p>
-            </div>
+                                <textarea
+                                    wire:model="pickupAddress"
+                                    rows="3"
+                                    class="w-full rounded-lg border border-gray-300 px-4 py-3"
+                                    placeholder="Enter complete address and landmark"
+                                ></textarea>
 
+                                @error('pickupAddress')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="mb-2 block text-sm font-semibold">
+                                    Preferred pick-up time *
+                                </label>
+
+                                <select
+                                    wire:model="pickupTime"
+                                    class="w-full rounded-lg border border-gray-300 px-4 py-3"
+                                >
+                                    <option value="">Select time</option>
+                                    @foreach (['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'] as $time)
+                                        <option value="{{ $time }}">
+                                            {{ \Carbon\Carbon::createFromFormat('H:i', $time)->format('g:i A') }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                @error('pickupTime')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Submit --}}
+                <div class="rounded-2xl bg-[#111111] p-6 text-white sm:p-8">
+                    <h3 class="text-xl font-bold">Ready to take the next step?</h3>
+                    <p class="mt-2 text-sm leading-6 text-gray-400">
+                        Review your information before submitting your appointment request.
+                    </p>
+
+                    <button type="submit"
+                            wire:loading.attr="disabled"
+                            wire:target="submit"
+                            class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-6 py-4 font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
+                        <span wire:loading.remove wire:target="submit">
+                            Submit Booking Request →
+                        </span>
+                        <span wire:loading wire:target="submit">
+                            Validating details...
+                        </span>
+                    </button>
+
+                    <p class="mt-4 text-xs leading-5 text-gray-500">
+                        By submitting, you agree that Hitek Automobiles may contact
+                        you about this service request.
+                    </p>
+                </div>
+
+            @endif
         </form>
     </section>
 

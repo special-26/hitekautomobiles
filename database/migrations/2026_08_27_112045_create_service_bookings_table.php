@@ -14,24 +14,23 @@ return new class extends Migration
         Schema::create('service_bookings', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('customer_id')
-                ->constrained('customers')
-                ->cascadeOnDelete();
+            $table->string('customer_name');
+            $table->string('phone', 10);
+            $table->string('email')->nullable();
 
-            $table->foreignId('vehicle_id')
-                ->constrained('vehicles')
-                ->cascadeOnDelete();
+            $table->boolean('pickup_drop_required')->default(false);
+            $table->text('pickup_address')->nullable();
+            $table->string('pickup_time')->nullable();
 
             $table->date('service_date');
-
             $table->string('slot_key');
-
             $table->string('service_type')->nullable();
-
+            $table->string('booking_reference', 30)
+                ->nullable()
+                ->unique();
             $table->text('notes')->nullable();
-
             $table->string('status')
-                ->default('confirmed');
+                ->default('pending');
 
             $table->timestamps();
 
@@ -41,8 +40,6 @@ return new class extends Migration
             );
 
             $table->index(['service_date', 'status']);
-            $table->index('customer_id');
-            $table->index('vehicle_id');
         });
     }
 
