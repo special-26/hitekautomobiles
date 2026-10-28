@@ -2,10 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Customer;
-use App\Models\Vehicle;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ServiceBooking extends Model
 {
@@ -27,14 +24,4 @@ class ServiceBooking extends Model
         'service_date' => 'date',
         'pickup_drop_required' => 'boolean',
     ];
-
-    public function customer(): BelongsTo
-    {
-        return $this->belongsTo(Customer::class);
-    }
-
-    public function vehicle(): BelongsTo
-    {
-        return $this->belongsTo(Vehicle::class);
-    }
 }
