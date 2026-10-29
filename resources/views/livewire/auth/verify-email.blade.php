@@ -1,13 +1,13 @@
 <x-layouts.auth>
     <div class="mt-4 flex flex-col gap-6 border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-neutral-950 sm:rounded-xl sm:p-10">
-        <x:text class="text-center">
+        <p class="text-center">
             {{ __('Please verify your email address by clicking on the link we just emailed to you.') }}
-        </x:text>
+        </p>
 
         @if (session('status') == 'verification-link-sent')
-            <x:text class="text-center font-medium !dark:text-green-400 !text-green-600">
+            <p class="text-center font-medium !dark:text-green-400 !text-green-600">
                 {{ __('A new verification link has been sent to the email address you provided during registration.') }}
-            </x:text>
+            </p>
         @endif
 
         <div class="flex flex-col items-center justify-between space-y-3">
