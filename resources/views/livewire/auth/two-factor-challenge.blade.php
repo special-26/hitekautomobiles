@@ -67,9 +67,9 @@
                         </div>
 
                         @error('recovery_code')
-                            <text color="red">
+                            <span color="red">
                                 {{ $message }}
-                            </text>
+                            </span>
                         @enderror
                     </div>
 

@@ -191,9 +191,9 @@ new class extends Component {
                         <badge color="green">{{ __('Enabled') }}</badge>
                     </div>
 
-                    <text>
+                    <span>
                         {{ __('With two-factor authentication enabled, you will be prompted for a secure, random pin during login, which you can retrieve from the TOTP-supported application on your phone.') }}
-                    </text>
+                    </span>
 
                     <livewire:settings.two-factor.recovery-codes :$requiresConfirmation/>
 
@@ -214,9 +214,9 @@ new class extends Component {
                         <badge color="red">{{ __('Disabled') }}</badge>
                     </div>
 
-                    <text variant="subtle">
+                    <span variant="subtle">
                         {{ __('When you enable two-factor authentication, you will be prompted for a secure pin during login. This pin can be retrieved from a TOTP-supported application on your phone.') }}
-                    </text>
+                    </span>
 
                     <button
                         variant="primary"
@@ -259,7 +259,7 @@ new class extends Component {
 
                 <div class="space-y-2 text-center">
                     <heading size="lg">{{ $this->modalConfig['title'] }}</heading>
-                    <text>{{ $this->modalConfig['description'] }}</text>
+                    <span>{{ $this->modalConfig['description'] }}</span>
                 </div>
             </div>
 
