@@ -287,6 +287,8 @@ class PermissionSeeder extends Seeder
 
             'marketing-studio.view',
 
+            'service-bookings.view',
+
             /*
             |--------------------------------------------------------------------------
             | Department Management

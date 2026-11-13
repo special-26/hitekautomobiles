@@ -102,7 +102,8 @@ class MarketingCreativeService
         }
 
         // Insert the optional uploaded photo.
-        // Each template gets its own photo placement.
+
+        // Insert uploaded photo or the default Car Service image.
         $photoPositions = match ($template) {
             'detailing-offer' => [0, 120, 1080, 410],
             'festival-greeting' => [90, 220, 900, 330],
@@ -112,20 +113,29 @@ class MarketingCreativeService
             default => [0, 130, 1080, 390],
         };
 
-        if (! empty($offer['car_photo_path'])) {
-            $photoPath = Storage::disk('public')->path(
-                $offer['car_photo_path']
-            );
+        $photoPath = $offer['car_photo_path'] ?? null;
 
-            if (File::exists($photoPath)) {
-                [$x, $y, $width, $height] = $photoPositions;
+        // Use the built-in image when no upload is provided.
+        if (! $photoPath && $template === 'car-service-promo') {
+            $defaultPhoto = 'marketing-templates/default-car-service.jpg';
 
-                $photo = $manager->decodePath($photoPath);
-                $photo->cover($width, $height);
-
-                $image->insert($photo, $x, $y);
+            if (Storage::disk('public')->exists($defaultPhoto)) {
+                $photoPath = $defaultPhoto;
             }
         }
+
+        if ($photoPath && Storage::disk('public')->exists($photoPath)) {
+            [$x, $y, $width, $height] = $photoPositions;
+
+            $photo = $manager->read(
+                Storage::disk('public')->path($photoPath)
+            );
+
+            $photo->cover($width, $height);
+
+            $image->place($photo, 'top-left', $x, $y);
+        }
+
 
         // Logo placement remains consistent across templates.
         if ($brand->logo_path) {

@@ -61,6 +61,12 @@ class Create extends Component
         'current_odometer' => '',
     ];
 
+    public $registrationSearch = '';
+    public $registrationSearchStatus = 'initial';
+    public $showInlineNewCustomerVehicle = false;
+
+    public $inlineCustomerMode = 'new'; // 'new' or 'existing'
+
     public $advisorResults = [];
 
     public function mount($customer = null, $vehicle = null)
@@ -134,6 +140,89 @@ class Create extends Component
         }
 
         // $this->loadAdvisors();
+    }
+
+    public function searchVehicleByRegistration(): void
+    {
+        $registration = strtoupper(
+            preg_replace('/[^A-Z0-9]/', '', $this->registrationSearch)
+        );
+
+        if ($registration === '') {
+            $this->addError('registrationSearch', 'Please enter a vehicle registration number.');
+            return;
+        }
+
+        $this->resetErrorBag('registrationSearch');
+
+        // Clear any previous selection before searching again.
+        $this->customer = null;
+        $this->vehicle = null;
+        $this->customerSearch = '';
+        $this->vehicleSearch = '';
+        $this->customerResults = [];
+        $this->vehicleResults = [];
+
+        $selectedVehicle = Vehicle::query()
+            ->where('is_active', true)
+            ->whereRaw(
+                "regexp_replace(upper(registration_number), '[^A-Z0-9]', '', 'g') = ?",
+                [$registration]
+            )
+            ->first();
+
+        if (! $selectedVehicle) {
+            $this->registrationSearchStatus = 'not_found';
+
+            // Pre-fill the registration number in the new vehicle form.
+            $this->newVehicle['registration_number'] = strtoupper(trim($this->registrationSearch));
+
+            return;
+        }
+
+        $selectedCustomer = Customer::query()
+            ->where('is_active', true)
+            ->find($selectedVehicle->customer_id);
+
+        if (! $selectedCustomer) {
+            $this->registrationSearchStatus = 'customer_missing';
+
+            return;
+        }
+
+        // Load the linked customer.
+        $this->customer = [
+            'id' => $selectedCustomer->id,
+            'name' => $selectedCustomer->name,
+            'mobile' => $selectedCustomer->phone,
+            'email' => $selectedCustomer->email,
+            'address' => collect([
+                $selectedCustomer->address,
+                $selectedCustomer->city,
+                $selectedCustomer->state,
+                $selectedCustomer->pincode,
+            ])->filter()->implode(', '),
+        ];
+
+        $this->customerSearch = $selectedCustomer->name;
+
+        // Load the vehicle.
+        $this->vehicle = [
+            'id' => $selectedVehicle->id,
+            'registration_no' => $selectedVehicle->registration_number,
+            'make' => $selectedVehicle->make,
+            'model' => $selectedVehicle->model,
+            'variant' => $selectedVehicle->variant,
+            'year' => $selectedVehicle->manufacturing_year,
+            'fuel_type' => $selectedVehicle->fuel_type,
+            'colour' => $selectedVehicle->color,
+            'km' => $selectedVehicle->current_odometer,
+        ];
+
+        $this->vehicleSearch = $selectedVehicle->registration_number;
+        $this->jobCard['odometer'] = $selectedVehicle->current_odometer ?? '';
+
+        $this->registrationSearchStatus = 'found';
     }
 
     public function updatedCustomerSearch()
@@ -475,6 +564,207 @@ class Create extends Component
             ->cancel('Cancel')
             ->send();
     }
+
+    public function setInlineCustomerMode(string $mode): void
+    {
+        if (! in_array($mode, ['new', 'existing'], true)) {
+            return;
+        }
+
+        $this->inlineCustomerMode = $mode;
+
+        // Clear customer selection and search results when switching modes.
+        $this->customer = null;
+        $this->customerSearch = '';
+        $this->customerResults = [];
+
+        // Clear customer validation errors when changing modes.
+        $this->resetValidation([
+            'newCustomer.name',
+            'newCustomer.phone',
+            'newCustomer.email',
+            'newCustomer.address',
+            'newCustomer.city',
+            'newCustomer.state',
+            'newCustomer.pincode',
+            'newCustomer.date_of_birth',
+        ]);
+    }
+
+    public function createCustomerAndVehicle(): void
+    {
+        // Validate customer fields only when creating a new customer.
+        $customerRules = $this->inlineCustomerMode === 'new'
+            ? [
+                'newCustomer.name' => ['required', 'string', 'max:255'],
+                'newCustomer.phone' => ['required', 'string', 'max:255'],
+                'newCustomer.email' => ['nullable', 'email', 'max:255'],
+                'newCustomer.address' => ['nullable', 'string'],
+                'newCustomer.city' => ['nullable', 'string', 'max:255'],
+                'newCustomer.state' => ['nullable', 'string', 'max:255'],
+                'newCustomer.pincode' => ['nullable', 'string', 'max:255'],
+                'newCustomer.date_of_birth' => ['nullable', 'date'],
+            ]
+            : [
+                'customer.id' => ['required', 'integer', 'exists:customers,id'],
+            ];
+
+        $validated = $this->validate(array_merge($customerRules, [
+            'newVehicle.registration_number' => ['required', 'string', 'max:255'],
+            'newVehicle.make' => ['required', 'string', 'max:255'],
+            'newVehicle.model' => ['required', 'string', 'max:255'],
+            'newVehicle.variant' => ['nullable', 'string', 'max:255'],
+            'newVehicle.fuel_type' => ['nullable', 'string', 'max:255'],
+            'newVehicle.manufacturing_year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
+            'newVehicle.color' => ['nullable', 'string', 'max:255'],
+            'newVehicle.vin' => ['nullable', 'string', 'max:255'],
+            'newVehicle.engine_number' => ['nullable', 'string', 'max:255'],
+            'newVehicle.current_odometer' => ['nullable', 'integer', 'min:0'],
+        ]));
+
+        $registrationNumber = strtoupper(trim($validated['newVehicle']['registration_number']));
+
+        $normalizedRegistration = preg_replace(
+            '/[^A-Z0-9]/',
+            '',
+            $registrationNumber
+        );
+
+        // Prevent duplicate registrations, ignoring spaces and punctuation.
+        $duplicateVehicle = Vehicle::query()
+            ->whereRaw(
+                "regexp_replace(upper(registration_number), '[^A-Z0-9]', '', 'g') = ?",
+                [$normalizedRegistration]
+            )
+            ->exists();
+
+        if ($duplicateVehicle) {
+            $this->addError(
+                'newVehicle.registration_number',
+                'A vehicle with this registration number already exists. Please search for it above.'
+            );
+
+            return;
+        }
+
+        $customerAndVehicle = DB::transaction(function () use (
+            $validated,
+            $registrationNumber
+        ) {
+            if ($this->inlineCustomerMode === 'existing') {
+                // Ensure the selected customer is active.
+                $customer = Customer::query()
+                    ->where('is_active', true)
+                    ->findOrFail($validated['customer']['id']);
+            } else {
+                // Create a new customer.
+                $customer = Customer::create([
+                    'name' => trim($validated['newCustomer']['name']),
+                    'phone' => trim($validated['newCustomer']['phone']),
+                    'email' => filled($validated['newCustomer']['email'])
+                        ? trim($validated['newCustomer']['email'])
+                        : null,
+                    'address' => filled($validated['newCustomer']['address'])
+                        ? trim($validated['newCustomer']['address'])
+                        : null,
+                    'city' => filled($validated['newCustomer']['city'])
+                        ? trim($validated['newCustomer']['city'])
+                        : null,
+                    'state' => filled($validated['newCustomer']['state'])
+                        ? trim($validated['newCustomer']['state'])
+                        : null,
+                    'pincode' => filled($validated['newCustomer']['pincode'])
+                        ? trim($validated['newCustomer']['pincode'])
+                        : null,
+                    'date_of_birth' => $validated['newCustomer']['date_of_birth'] ?: null,
+                    'customer_code' => 'CUS-' . strtoupper(uniqid()),
+                    'public_token' => Str::random(64),
+                    'is_active' => true,
+                ]);
+            }
+
+            $vehicle = Vehicle::create([
+                'customer_id' => $customer->id,
+                'registration_number' => $registrationNumber,
+                'make' => trim($validated['newVehicle']['make']),
+                'model' => trim($validated['newVehicle']['model']),
+                'variant' => filled($validated['newVehicle']['variant'])
+                    ? trim($validated['newVehicle']['variant'])
+                    : null,
+                'fuel_type' => filled($validated['newVehicle']['fuel_type'])
+                    ? trim($validated['newVehicle']['fuel_type'])
+                    : null,
+                'manufacturing_year' => $validated['newVehicle']['manufacturing_year'] ?: null,
+                'color' => filled($validated['newVehicle']['color'])
+                    ? trim($validated['newVehicle']['color'])
+                    : null,
+                'vin' => filled($validated['newVehicle']['vin'])
+                    ? strtoupper(trim($validated['newVehicle']['vin']))
+                    : null,
+                'engine_number' => filled($validated['newVehicle']['engine_number'])
+                    ? strtoupper(trim($validated['newVehicle']['engine_number']))
+                    : null,
+                'current_odometer' => $validated['newVehicle']['current_odometer'] ?: null,
+                'is_active' => true,
+            ]);
+
+            return [
+                'customer' => $customer,
+                'vehicle' => $vehicle,
+            ];
+        });
+
+        $customer = $customerAndVehicle['customer'];
+        $vehicle = $customerAndVehicle['vehicle'];
+
+        // Populate the same state structure used by the existing job-card workflow.
+        $this->customer = [
+            'id' => $customer->id,
+            'name' => $customer->name,
+            'mobile' => $customer->phone,
+            'email' => $customer->email,
+            'address' => collect([
+                $customer->address,
+                $customer->city,
+                $customer->state,
+                $customer->pincode,
+            ])->filter()->implode(', '),
+        ];
+
+        $this->vehicle = [
+            'id' => $vehicle->id,
+            'registration_no' => $vehicle->registration_number,
+            'make' => $vehicle->make,
+            'model' => $vehicle->model,
+            'variant' => $vehicle->variant,
+            'year' => $vehicle->manufacturing_year,
+            'fuel_type' => $vehicle->fuel_type,
+            'colour' => $vehicle->color,
+            'km' => $vehicle->current_odometer,
+        ];
+
+        $this->customerSearch = $customer->name;
+        $this->vehicleSearch = $vehicle->registration_number;
+        $this->jobCard['odometer'] = $vehicle->current_odometer ?? '';
+
+        $this->customerResults = [];
+        $this->vehicleResults = [];
+
+        $this->registrationSearch = $vehicle->registration_number;
+        $this->registrationSearchStatus = 'found';
+        $this->showInlineNewCustomerVehicle = false;
+
+        $this->inlineCustomerMode = 'new';
+
+        $this->toast()
+            ->position('top-center')
+            ->success(
+                'Customer & Vehicle Added',
+                'The vehicle has been added successfully.'
+            )
+            ->send();
+    }
+
     public function clearCustomer()
     {
         $this->customer = null;

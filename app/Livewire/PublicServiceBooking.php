@@ -90,6 +90,7 @@ class PublicServiceBooking extends Component
 
         $bookedSlots = ServiceBooking::query()
             ->whereDate('service_date', $date->toDateString())
+            ->whereNotIn('status', ['cancelled', 'rejected'])
             ->pluck('slot_key')
             ->map(fn($slot) => (string) $slot)
             ->all();
@@ -220,33 +221,41 @@ class PublicServiceBooking extends Component
         }
 
         try {
-            $booking = ServiceBooking::query()->create([
-                'customer_name' => trim($validated['customerName']),
-                'phone' => trim($validated['phone']),
-                'email' => $validated['email'] ?: null,
+            $booking = DB::transaction(function () use ($validated) {
+                $booking = ServiceBooking::query()->create([
+                    'customer_name' => trim($validated['customerName']),
+                    'phone' => trim($validated['phone']),
+                    'email' => $validated['email'] ?: null,
 
-                'service_date' => $validated['preferredDate'],
-                'slot_key' => $validated['preferredTime'],
-                'service_type' => $validated['serviceCategory'],
-                'notes' => $validated['serviceDetails'] ?: null,
+                    'service_date' => $validated['preferredDate'],
+                    'slot_key' => $validated['preferredTime'],
+                    'service_type' => $validated['serviceCategory'],
+                    'notes' => $validated['serviceDetails'] ?: null,
 
-                'pickup_drop_required' => $this->pickupDropRequired,
-                'pickup_address' => $this->pickupDropRequired
-                    ? trim($this->pickupAddress)
-                    : null,
-                'pickup_time' => $this->pickupDropRequired
-                    ? $this->pickupTime
-                    : null,
+                    'pickup_drop_required' => $this->pickupDropRequired,
+                    'pickup_address' => $this->pickupDropRequired
+                        ? trim($this->pickupAddress)
+                        : null,
+                    'pickup_time' => $this->pickupDropRequired
+                        ? $this->pickupTime
+                        : null,
 
-                'status' => 'pending',
-            ]);
+                    'status' => 'pending',
+                ]);
 
-            $this->bookingReference = 'HB-' . str_pad(
-                (string) $booking->id,
-                6,
-                '0',
-                STR_PAD_LEFT
-            );
+                $booking->booking_reference = 'HB-' . str_pad(
+                    (string) $booking->id,
+                    6,
+                    '0',
+                    STR_PAD_LEFT
+                );
+
+                $booking->save();
+
+                return $booking;
+            });
+
+            $this->bookingReference = $booking->booking_reference;
 
             $this->submitted = true;
 

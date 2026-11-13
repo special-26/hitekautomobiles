@@ -39,6 +39,7 @@ use App\Livewire\Payroll\Settings as PayrollSettings;
 use App\Livewire\PublicServiceBooking;
 use App\Livewire\ServiceSlotBooking;
 use App\Livewire\ServiceTasks\Index as ServiceTasksIndex;
+use App\Livewire\ServiceBookings\Index as ServiceBookingIndex;
 use App\Livewire\Shifts\Index as ShiftsIndex;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -109,6 +110,10 @@ Route::prefix('vehicles')->middleware(['auth'])->group(function () {
     Route::get('/vehicles/{vehicle}/edit', VehicleEdit::class)
         ->name('vehicles.edit');
 });
+// Service booking list
+Route::get('/service-bookings', ServiceBookingIndex::class)
+    ->middleware('can:service-bookings.view')
+    ->name('service-bookings.index');
 
 // Service Task Routes
 Route::get('/service-tasks', ServiceTasksIndex::class)
@@ -183,7 +188,7 @@ Route::get('/marketing-studio/canvas', CanvasEditor::class)
     ->middleware(['auth', 'can:marketing-studio.view'])
     ->name('marketing-studio.canvas');
 
-// Book Service 
+// Public Book Service 
 Route::get('/book-service', PublicServiceBooking::class)
     ->name('book-service');
 

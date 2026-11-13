@@ -103,6 +103,263 @@
 
     </div>
 
+    {{-- Vehicle Registration Search --}}
+    <div class="rounded-xl border border-slate-200 bg-white">
+        <div class="border-b border-slate-200 px-5 py-4">
+            <h2 class="font-semibold text-slate-900">
+                Find Vehicle
+            </h2>
+
+            <p class="mt-1 text-xs text-slate-500">
+                Start by entering the vehicle registration number.
+                We'll automatically load the linked customer if the vehicle already exists.
+            </p>
+        </div>
+
+        <div class="p-5">
+            <div class="flex flex-col gap-3 sm:flex-row">
+                <div class="relative flex-1">
+                    <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
+                        🔍
+                    </span>
+
+                    <input
+                        type="text"
+                        wire:model="registrationSearch"
+                        wire:keydown.enter="searchVehicleByRegistration"
+                        placeholder="Enter registration number (e.g. CH01AB1234)"
+                        class="w-full rounded-lg border border-slate-200 py-3 pl-10 pr-4 text-sm uppercase text-slate-700 outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
+                    >
+
+                    @error('registrationSearch')
+                        <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <button
+                    type="button"
+                    wire:click="searchVehicleByRegistration"
+                    wire:loading.attr="disabled"
+                    wire:target="searchVehicleByRegistration"
+                    class="rounded-lg bg-hitek-red px-5 py-3 text-sm font-semibold text-white hover:bg-hitek-red-hover disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                    <span wire:loading.remove wire:target="searchVehicleByRegistration">
+                        Search Vehicle
+                    </span>
+
+                    <span wire:loading wire:target="searchVehicleByRegistration">
+                        Searching...
+                    </span>
+                </button>
+            </div>
+
+            @if ($registrationSearchStatus === 'found')
+                <div class="mt-4 flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4">
+                    <span class="text-lg">✓</span>
+                    <div>
+                        <p class="text-sm font-semibold text-green-800">
+                            Existing vehicle found
+                        </p>
+                        <p class="mt-1 text-xs text-green-700">
+                            Customer and vehicle details have been loaded below.
+                        </p>
+                    </div>
+                </div>
+            @elseif ($registrationSearchStatus === 'not_found')
+                <div class="mt-4 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                    <span class="text-lg">!</span>
+                    <div>
+                        <p class="text-sm font-semibold text-amber-800">
+                            Vehicle not found
+                        </p>
+                        <p class="mt-1 text-xs text-amber-700">
+                            Enter the new vehicle and customer details below to continue.
+                        </p>
+                    </div>
+                </div>
+            @elseif ($registrationSearchStatus === 'customer_missing')
+                <div class="mt-4 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
+                    <span class="text-lg">!</span>
+                    <div>
+                        <p class="text-sm font-semibold text-red-800">
+                            Customer record unavailable
+                        </p>
+                        <p class="mt-1 text-xs text-red-700">
+                            This vehicle is linked to an inactive or missing customer. Please contact an administrator.
+                        </p>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    {{-- Inline New Customer + Vehicle --}}
+    @if ($registrationSearchStatus === 'not_found')
+        <div class="rounded-xl border border-amber-200 bg-white">
+            <div class="border-b border-amber-200 bg-amber-50 px-5 py-4">
+                <h2 class="font-semibold text-slate-900">
+                    {{ $inlineCustomerMode === 'existing'
+                        ? 'Add Vehicle to Existing Customer'
+                        : 'Register New Customer & Vehicle' }}
+                </h2>
+
+                <p class="mt-1 text-xs text-slate-600">
+                    {{ $inlineCustomerMode === 'existing'
+                        ? 'Select the customer first, then enter the details of their new vehicle.'
+                        : 'Enter the customer and vehicle details. Both records will be created together.' }}
+                </p>
+            </div>
+
+            <div class="space-y-6 p-5">
+
+                {{-- Customer Mode Selector --}}
+                <div>
+                    <label class="mb-2 block text-sm font-medium text-slate-700">
+                        Customer
+                    </label>
+
+                    <div class="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-1">
+                        <button
+                            type="button"
+                            wire:click="setInlineCustomerMode('existing')"
+                            class="rounded-md px-4 py-2 text-sm font-medium transition
+                                {{ $inlineCustomerMode === 'existing'
+                                    ? 'bg-white text-slate-900 shadow-sm'
+                                    : 'text-slate-600 hover:text-slate-900' }}"
+                        >
+                            Existing Customer
+                        </button>
+
+                        <button
+                            type="button"
+                            wire:click="setInlineCustomerMode('new')"
+                            class="rounded-md px-4 py-2 text-sm font-medium transition
+                                {{ $inlineCustomerMode === 'new'
+                                    ? 'bg-white text-slate-900 shadow-sm'
+                                    : 'text-slate-600 hover:text-slate-900' }}"
+                        >
+                            New Customer
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Existing Customer Search --}}
+                @if ($inlineCustomerMode === 'existing')
+                    <div class="rounded-lg border border-slate-200 p-4">
+                        @if (!empty($customer['id']))
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">
+                                        Selected Customer
+                                    </p>
+
+                                    <p class="mt-1 font-semibold text-slate-900">
+                                        {{ $customer['name'] ?? 'Customer' }}
+                                    </p>
+
+                                    <p class="text-sm text-slate-600">
+                                        {{ $customer['phone'] ?? '' }}
+                                    </p>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    wire:click="setInlineCustomerMode('existing')"
+                                    class="text-sm font-medium text-hitek-red hover:underline"
+                                >
+                                    Change Customer
+                                </button>
+                            </div>
+                        @else
+                            <label class="mb-2 block text-sm font-medium text-slate-700">
+                                Search Existing Customer
+                            </label>
+
+                            <input
+                                type="text"
+                                wire:model.live.debounce.300ms="customerSearch"
+                                placeholder="Search by customer name or mobile..."
+                                class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-hitek-red focus:outline-none focus:ring-1 focus:ring-hitek-red"
+                            >
+
+                            @error('customer.id')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+
+                            @if (count($customerResults) > 0)
+                                <div class="mt-2 overflow-hidden rounded-lg border border-slate-200">
+                                    @foreach ($customerResults as $result)
+                                        <button
+                                            type="button"
+                                            wire:key="inline-customer-result-{{ $result['id'] }}"
+                                            wire:click="selectCustomer({{ $result['id'] }})"
+                                            class="flex w-full items-center justify-between border-b border-slate-100 px-3 py-3 text-left last:border-b-0 hover:bg-slate-50"
+                                        >
+                                            <div>
+                                                <p class="text-sm font-medium text-slate-900">
+                                                    {{ $result['name'] }}
+                                                </p>
+                                                <p class="text-xs text-slate-500">
+                                                    {{ $result['phone'] ?? '' }}
+                                                </p>
+                                            </div>
+
+                                            <span class="text-xs font-medium text-hitek-red">
+                                                Select
+                                            </span>
+                                        </button>
+                                    @endforeach
+                                </div>
+                            @elseif (strlen($customerSearch) >= 2)
+                                <p class="mt-2 text-xs text-slate-500">
+                                    No matching customer found. Switch to “New Customer” to create one.
+                                </p>
+                            @endif
+                        @endif
+                    </div>
+                @else
+                    {{-- New Customer Fields --}}
+                    @include('livewire.job-cards.partials.customer-fields')
+                @endif
+
+                {{-- Vehicle Fields: shown in both modes --}}
+                <div class="border-t border-slate-200 pt-6">
+                    <h3 class="mb-4 text-sm font-semibold text-slate-900">
+                        New Vehicle Details
+                    </h3>
+
+                    @include('livewire.job-cards.partials.vehicle-fields')
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3 border-t border-slate-200 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <p class="text-xs text-slate-500">
+                    * Required fields.
+                    {{ $inlineCustomerMode === 'existing'
+                        ? 'The new vehicle will be linked to the selected customer.'
+                        : 'The customer and vehicle will be linked automatically.' }}
+                </p>
+
+                <button
+                    type="button"
+                    wire:click="createCustomerAndVehicle"
+                    wire:loading.attr="disabled"
+                    wire:target="createCustomerAndVehicle"
+                    class="rounded-lg bg-hitek-red px-5 py-2.5 text-sm font-semibold text-white hover:bg-hitek-red-hover disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                    <span wire:loading.remove wire:target="createCustomerAndVehicle">
+                        {{ $inlineCustomerMode === 'existing'
+                            ? 'Save Vehicle for Customer'
+                            : 'Save Customer & Vehicle' }}
+                    </span>
+
+                    <span wire:loading wire:target="createCustomerAndVehicle">
+                        Saving...
+                    </span>
+                </button>
+            </div>
+        </div>
+    @endif
 
     {{-- Customer + Vehicle --}}
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -1148,161 +1405,7 @@
 
                 {{-- Modal Body --}}
                 <div class="max-h-[75vh] overflow-y-auto px-6 py-5">
-
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-
-                        {{-- Name --}}
-                        <div class="sm:col-span-2">
-
-                            <label class="mb-1.5 block text-sm font-medium text-slate-700">
-                                Customer Name <span class="text-hitek-red">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                wire:model="newCustomer.name"
-                                placeholder="Enter customer name"
-                                class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-
-                            @error('newCustomer.name')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- Phone --}}
-                        <div>
-
-                            <label class="mb-1.5 block text-sm font-medium text-slate-700">
-                                Mobile <span class="text-hitek-red">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                wire:model="newCustomer.phone"
-                                placeholder="Enter mobile number"
-                                class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-
-                            @error('newCustomer.phone')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- Email --}}
-                        <div>
-
-                            <label class="mb-1.5 block text-sm font-medium text-slate-700">
-                                Email
-                            </label>
-
-                            <input
-                                type="email"
-                                wire:model="newCustomer.email"
-                                placeholder="customer@example.com"
-                                class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-
-                            @error('newCustomer.email')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- Address --}}
-                        <div class="sm:col-span-2">
-
-                            <label class="mb-1.5 block text-sm font-medium text-slate-700">
-                                Address
-                            </label>
-
-                            <textarea
-                                wire:model="newCustomer.address"
-                                rows="2"
-                                placeholder="Enter address"
-                                class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            ></textarea>
-
-                            @error('newCustomer.address')
-                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                            @enderror
-
-                        </div>
-
-
-                        {{-- City --}}
-                        <div>
-
-                            <label class="mb-1.5 block text-sm font-medium text-slate-700">
-                                City
-                            </label>
-
-                            <input
-                                type="text"
-                                wire:model="newCustomer.city"
-                                placeholder="Chandigarh"
-                                class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-
-                        </div>
-
-
-                        {{-- State --}}
-                        <div>
-
-                            <label class="mb-1.5 block text-sm font-medium text-slate-700">
-                                State
-                            </label>
-
-                            <input
-                                type="text"
-                                wire:model="newCustomer.state"
-                                placeholder="Punjab"
-                                class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-
-                        </div>
-
-
-                        {{-- Pincode --}}
-                        <div>
-
-                            <label class="mb-1.5 block text-sm font-medium text-slate-700">
-                                Pincode
-                            </label>
-
-                            <input
-                                type="text"
-                                wire:model="newCustomer.pincode"
-                                placeholder="160002"
-                                class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-
-                        </div>
-
-
-                        {{-- DOB --}}
-                        <div>
-
-                            <label class="mb-1.5 block text-sm font-medium text-slate-700">
-                                Date of Birth
-                            </label>
-
-                            <input
-                                type="date"
-                                wire:model="newCustomer.date_of_birth"
-                                class="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-
-                        </div>
-
-                    </div>
-
+                    @include('livewire.job-cards.partials.customer-fields')
                 </div>
 
 
@@ -1377,173 +1480,8 @@
 
                 {{-- Modal Body --}}
                 <div class="max-h-[70vh] overflow-y-auto p-6">
-
-                    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-
-                        {{-- Registration --}}
-                        <div>
-                            <label class="text-sm font-medium text-slate-700">
-                                Registration Number
-                                <span class="text-red-500">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                wire:model="newVehicle.registration_number"
-                                placeholder="e.g. CH01AB1234"
-                                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm uppercase outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-                        </div>
-
-
-                        {{-- Make --}}
-                        <div>
-                            <label class="text-sm font-medium text-slate-700">
-                                Make
-                                <span class="text-red-500">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                wire:model="newVehicle.make"
-                                placeholder="e.g. Hyundai"
-                                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-                        </div>
-
-
-                        {{-- Model --}}
-                        <div>
-                            <label class="text-sm font-medium text-slate-700">
-                                Model
-                                <span class="text-red-500">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                wire:model="newVehicle.model"
-                                placeholder="e.g. Creta"
-                                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-                        </div>
-
-
-                        {{-- Variant --}}
-                        <div>
-                            <label class="text-sm font-medium text-slate-700">
-                                Variant
-                            </label>
-
-                            <input
-                                type="text"
-                                wire:model="newVehicle.variant"
-                                placeholder="e.g. SX"
-                                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-                        </div>
-
-
-                        {{-- Fuel --}}
-                        <div>
-                            <label class="text-sm font-medium text-slate-700">
-                                Fuel Type
-                            </label>
-
-                            <select
-                                wire:model="newVehicle.fuel_type"
-                                class="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-                                <option value="">Select fuel type</option>
-                                <option value="Petrol">Petrol</option>
-                                <option value="Diesel">Diesel</option>
-                                <option value="CNG">CNG</option>
-                                <option value="Electric">Electric</option>
-                                <option value="Hybrid">Hybrid</option>
-                            </select>
-                        </div>
-
-
-                        {{-- Year --}}
-                        <div>
-                            <label class="text-sm font-medium text-slate-700">
-                                Manufacturing Year
-                            </label>
-
-                            <input
-                                type="number"
-                                wire:model="newVehicle.manufacturing_year"
-                                placeholder="e.g. 2022"
-                                min="1900"
-                                max="2100"
-                                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-                        </div>
-
-
-                        {{-- Colour --}}
-                        <div>
-                            <label class="text-sm font-medium text-slate-700">
-                                Colour
-                            </label>
-
-                            <input
-                                type="text"
-                                wire:model="newVehicle.color"
-                                placeholder="e.g. White"
-                                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-                        </div>
-
-
-                        {{-- Odometer --}}
-                        <div>
-                            <label class="text-sm font-medium text-slate-700">
-                                Current Odometer
-                            </label>
-
-                            <input
-                                type="number"
-                                wire:model="newVehicle.current_odometer"
-                                placeholder="e.g. 45000"
-                                min="0"
-                                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-                        </div>
-
-
-                        {{-- VIN --}}
-                        <div>
-                            <label class="text-sm font-medium text-slate-700">
-                                VIN / Chassis Number
-                            </label>
-
-                            <input
-                                type="text"
-                                wire:model="newVehicle.vin"
-                                placeholder="Enter VIN"
-                                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm uppercase outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-                        </div>
-
-
-                        {{-- Engine --}}
-                        <div>
-                            <label class="text-sm font-medium text-slate-700">
-                                Engine Number
-                            </label>
-
-                            <input
-                                type="text"
-                                wire:model="newVehicle.engine_number"
-                                placeholder="Enter engine number"
-                                class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm uppercase outline-none focus:border-hitek-red focus:ring-2 focus:ring-hitek-red/10"
-                            >
-                        </div>
-
-                    </div>
-
+                    @include('livewire.job-cards.partials.vehicle-fields')
                 </div>
-
 
                 {{-- Modal Footer --}}
                 <div class="flex items-center justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4">

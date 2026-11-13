@@ -264,6 +264,8 @@ class RoleSeeder extends Seeder
 
             'marketing-studio.view',
 
+            'service-bookings.view',
+
             // Departments
             'departments.view',
             'departments.create',
